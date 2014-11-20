@@ -1,0 +1,418 @@
+% \documentclass[12pt,titlepage,letterpaper]{report}
+%\documentclass[12pt,titlepage]{report}
+\documentstyle[11pt]{article}
+%\documentclass[dvips,titlepage,12pt]{report}
+
+%\usepackage{draftcopy}
+
+%\pagestyle{empty}
+
+\oddsidemargin=10mm
+\evensidemargin=-10mm
+\topmargin=0mm
+\headheight=0mm
+\headsep=0mm
+\textheight=230mm
+\textwidth=175mm
+\voffset=-0.5cm
+\hoffset=-1.5cm
+
+\begin{document}
+
+\title{ 
+Validation Package for Comparing GENIE Predictions vs Results from MINERvA Collaboration
+}
+\author{
+Julia Yarba                             \\
+{\em Fermilab, P.O.Box 500, Batavia, IL 60510, USA} \\
+}
+\maketitle
+
+\baselineskip=17pt
+
+\section{Introduction}
+
+The Data-MonteCarlo validation application described in this note aims at comparing predictions of the GENIE\cite{geniemanual} 
+neutrino interaction generator vs a variety of published experimental data.
+
+At present, the efforts focuse on the recent results from the MINERvA collaboration\cite{minerva1}.
+
+However, several software elements of the application are general enough to be possibly used in other 
+similar applications.
+
+\section{General Information and Setup}
+
+In order to build and run the application, you will need:
+\begin{itemize}
+\item{GENIE package (and its externals/dependencies)}
+\item{RooMUHisto package\cite{roomuhistos} (also see next section)}
+\end{itemize}
+
+GENIE is often centrally available of many machines/clusters at Fermilab. \\
+In addition to generating neutrino or antineutrino interactions with nuclei, several infrastructural components 
+of GENIE are used by this validation application code.
+
+The RooMUHistos package needs to be built, as it is still development/test stage. \\
+The RooMUHistos functionalities are largely used by this validation application code.
+
+The package consists of the following:
+\begin{itemize}
+\item{C++ source code}
+\item{Makefile}
+\item{Experimental data in the form of ASCII tables, stored in the ./exp-MINERvA subdirectory}
+\item{Neutrino and antineutrino flux files in the form of ASCII tables, stored in ./flux-MINERvA subdirectory}
+\end{itemize}
+
+\section{RooMUHistos}
+
+We use the RooMUHisto framework to display and compare the experimental data and/or simulated results.
+
+The framework is freely available from the GitHub:
+\begin{itemize}
+\item{https://github.com/ManyUniverseAna/RooMUHistos}
+\end{itemize}
+
+In addition to a variety of plotting utilities, it also offers several functionalities for a statistical 
+analysis of the simulated results vs experimental data.
+
+The RooMUHistos package is supplied with a small README that offers startup tips.
+
+The source code of the package is also outfitted with doxygen-style documentation.
+
+WARNING: The RooMUHisto framework is still under development. This application should be considered as
+it's beta-testing. Some features of the RooMUHisto framework are being refined, as described in the Appendix.
+
+\section{Generate GENIE Sample}
+
+One can generate a desired GENIE sample using pre-fabricated { \bf \it gengev } utility.
+
+Instruction for using pre-fabricated { \bf \it gevgen} utility start of page 69 of 
+the GENIE Physics and User's Manual which can be found here:
+\begin{itemize}
+\item{https://genie.hepforge.org/manuals/GENIE\_PhysicsAndUserManual\_20130615.pdf}
+\end{itemize}
+
+\subsection{Splines}
+
+One of the components needed for GENIE event generation are splines.
+
+In general, a user can generate her/his won splines, as described in the GENIE manual\cite{geniemanual}, 
+(Section 4, pp.61-62).
+
+A collection of pre-fabricated splines, grouped by GENIE version, is also available for download from hepforge:
+\begin{itemize}
+\item{https://www.hepforge.org/archive/genie/data}
+\end{itemize} 
+
+
+For this particular application you can download the vA splines from hepforge:
+\begin{itemize}
+\item{https://www.hepforge.org/archive/genie/data/2.8.0/gxspl-vA-v2.8.0.xml.gz}
+\end{itemize}
+
+\subsection{Composite Target}
+  
+MINERvA uses plastic scintillator know as Hydrocarbon (CH).
+It is a composition of Hydrogen and Carbon; and the proportion of the atomic weights is 0.077418/0.922582. 
+
+In the GENIE event generation process it should be treated a composite target definition, i.e. on input 
+to gevgen it should use fractional atomic weights, as will be exemplified later in this document.
+
+\subsection{Neutrino/Antineutrino Flux File(s)}
+  
+The MINERvA flux descriptions for neutrino and antineutrino have be extracted from the MINERvA 
+publications\cite{minerva1}.
+
+They are stored with this application, in a form of GENIE-compatible ASCII tables, in the ./flux-MINERvA subdirectory:
+\begin{itemize} 
+\item{./flux-MINERvA/nu-flux-MINERvA.data}
+\item{./flux-MINERvA/nubar-flux-MINERvA.data}
+\end{itemize}
+
+\subsection{Run {\it gevgen} }
+
+In the following example it is assumed that the cross-section splines have been downloaded as described earlier, 
+and have been stored in the ./splines subdirectory.
+
+Usage example is as follows: \\
+{\it gevgen} -r 1 -n 100000 -p 14 -e 1.5,10 -t1000010010[0.077418],1000060120[0.922582] \ \\ 
+--cross-sections ./splines/gxspl-vA-v2.8.0.xml \ \\
+-f ./flux-MINERvA/nu-flux-MINERvA.data
+
+This will generate 100K events for the neutrino ( -p 14 ) projectile incident of the 
+Hydrocarbon target (the -t argument field) using splines for vA and the MINERvA flux file for neutrino. \\
+Based on the contents of the MINERvA flux file, the neutrino energy range is set at 1.5-10GeV ( -e 1.5,10). \\
+The run number is 1 ( -r 1 ). 
+Because the the run number is 1 in this case, the output file will be named gntp.1.ghep.root 
+(in general, the naming convenstion is gntp.[run-number].ghep.root). \\
+Unfortunately, there's no input argument to explicitly name the output of { \bf \it gevgen}.
+You have to be careful when generating multiple sample as you always have to make sure that
+the run number is unique. 
+
+If you wish to generate an antineutrino sample, please use input arguments as follows:
+\begin{itemize}
+\item{-r [ Unique-ID-of-your-choice ]}
+\item{ -p -14}
+\item{ -f ./flux-MINERvA/nubar-flux-MINERvA.data}
+\end{itemize}
+The target definition and the cross-sections are the same as in generating neutrino sample. 
+
+The generation time is going to vary depending on your CPU; for example, it takes ~30-40min 
+of wall clock time on cluck.fnal.gov (AMD Opteron(tm) Processor 6136). \\
+The output file size is going to be ~80Mb. \\
+If you need a larger statistics, please plan your resources accordingly.
+In case you wish to split the statistics into multiple jobs, please bear in mind the [ -seed YourSeed ] 
+input argument of the gevgen utility, to set appropriate seeds for your parallel jobs.
+Also make sure to set a unique run number of each of the fractional jobs.
+
+\section{GENIE Event Reweighting}
+
+GENIE Event Reweighting machinery is described in GENIE manual\cite{geniemanual}, pp.129-156.
+
+A convenient way to start is to use pre-fabricated {\it grwght1scan} utility that is available with 
+the GENIE install. This utility has functionalities to vary a number of GENIE parameters and to reweight
+GENIE generated events accordingly.
+However, {\it grwght1scan} does not include the full set of GENIE parameters to vary, and in a sense
+should be considered as an example of reweighting application.
+Based on the physics case and desired study, a user may implement her/his own application, as described 
+in the GENIE manual\cite{geniemanual}.
+
+In this document we describe how we have varied the Axial mass ($M_{a}$ for charged-current quasi-elastic 
+scattering processes (CCQE)) with the use {\it grwght1scan}.
+
+On input to {\it grwght1scan} we have used pre-generated GENIE samples for the neutrino or antineutrino.
+
+Example usage for reweighting neutrino events is as follows:
+\begin{itemize}
+\item { {\it grwght1scan } -f gntp.1.ghep.root -s MaCCQE -t 5}
+\end{itemize}
+
+Please note that "MaCCQE" is the name of the GENIE parameter that describes the axial mass for CC QE.
+For the list of other names, please see \$GENIE/src/ReWeight/GSyst.h 
+
+We have specified 5 "tweak dial" for this parameter. \\
+It means that the system will pick 5 variants in the range from -1 to 1, as measured in the units of $\sigma_{Ma}$. 
+The "tweaks" are evenly spaced as (-1, -0.5, 0., 0.5, 1.).
+The "middle tweak" (zero-tweak) corresponds to the nominal value of $M_{a}$.
+
+The name of the output file will be weights\_MaCCQE.root. \\
+Note that there is { \bf no } input argument to explicitly specify the name of the output of {\it grwght1scan}. 
+When reweighting multiple samples, make sure to manually rename the output of each run.
+
+In general, approximetely the same amount time is needed to reweight events as it takes to generate them.
+
+\section{The Experimental Data}
+
+The experimental data have been extracted from MINERvA publications\cite{minerva1} on neutrino or antineutrino 
+quasi-elastic scattering off neutrons or protons in the Hydrocarbon target. 
+
+The data are stored in a plain ASCII tables in the dedicated subdirectory:
+\begin{itemize}
+\item{./exp-MINERvA/nu-Hydrocarbon.data}
+\item{./exp-MINERvA/nubar-Hydrocarbon.data}
+\end{itemize}
+
+\section{The Validation Application}
+
+The validation application performs analysis of the charged-current quasi-elastic scattering of neutrino 
+or antineutrino in the CH target as it is modeled by GENIE, and compares GENIE predisions with the
+experimental results as measured by the MINERvA collaboration.
+
+At present, the application analyses two (2) GENIE samples combined with their respective reweighting
+outputs, that are descrbed in earlier sections.
+
+The application builds with a single command:
+make
+
+The resulting executable is $tstMINERvA$, and it executes as follows:
+./tstMINERvA
+
+The source code of all classes is fairly compact and reasonably self-explainatory.
+
+As of now, the application does {\bf not } require any input argument, as the use of the datasets and
+of the GENIE samples are hardcoded; {\bf this will change in the future}.
+
+At present, the validation application consists of the following:
+\begin{itemize}
+\item{the main program {\it testMINERvA.cxx}.
+A schematic workflow is as follows: \\
+{\small 
+int main() \\
+\{   \\
+ExpData* data = new ExpData(); \\
+data$->$ReadExpData( "./exp-MINERvA/nu-Hydrocarbon.data" ); \\
+data$->$ReadExpData( "./exp-MINERvA/nubar-Hydrocarbon.data" ); \\
+MCAnalysis* mcanalysis = new MCAnalysis(); \\
+   for ( int i=0; i$<$data$->$GetNDataSets(); ++i ) \\
+   \{ \\
+      const ExpDataSet* dset   = data$->$GetExpDataSet( i ); \\
+      mcanalysis$->$AddMCAnalyzer( dset ); \\
+   \} \\
+   mcanalysis$->$Reset(); \\
+   mcanalysis$->$Analyze( "/data/g4/tmp-genie-samples/nu-Hydrocarbon/100K/gntp.1.ghep.root", \\
+                        "/data/g4/tmp-genie-samples/nu-Hydrocarbon/100K/nu-CH-weights-MaCCQE.root"); \\
+   mcanalysis$->$Analyze( "/data/g4/tmp-genie-samples/nubar-Hydrocarbon/100K/gntp.2.ghep.root", \\
+                        "/data/g4/tmp-genie-samples/nubar-Hydrocarbon/100K/nubar-CH-weights-MaCCQE.root"); \\
+   mcanalysis$->$EndOfRun(); \\
+   MINERvADataMC* datamc = new MINERvADataMC(); \\   
+   datamc$->$FinalizeResults( data, mcanalysis ); \\
+   delete datamc; \\
+   delete mcanalysis; \\
+   delete data; \\
+   return 0; \\
+\} \\
+}
+}
+\item{The experimental data classes {\it ExpData} and the {\it ExpDataSet} (currently bundled together 
+in the ExpData.h and ExpData.cxx files). The {\it ExpDataSet} relies on the functionalities of the RooMUHistos 
+package\cite{roomuhistos}.
+\begin{itemize}
+\item{ {\it ExpData} object adds/stores a ExpDataSet object to its collection of datasets by reading the 
+data locatedat the specified path, via the public method ExpData::ReadExpData. It can read/store multiple 
+datasets. It also has public access methods to retreive the number of datasets and/or a pointer to a particular 
+dataset, by the dataset's serial number of by its name.}
+\item{ {\it ExpDataSet} object reads a particular dataset (only one) located at the specified path, and stores
+relevant information, such a reference to the publication, observable, interaction type, the data with the 
+uncertainties, correlation or covariance matrix (if specified). It also provides public methods to access 
+the stored information. Additional details are given in the Appendix.
+% The data together with statistical errors are stored in a form of {\it MUH1D }histogram.
+% The systematic errors can be added in one of the following way. If only systematic errors are provided for 
+% a given dataset, they will be stored as a {\it MUVertBand} data member of the {\it MUH1D } object that holds 
+% data points and statistical errors. If both systematic errors and correlation matrix are provided, a covariance 
+% matrix will be calculated and stored as a data member of the {\it MUH1D } object. If a covariance matrix is 
+% provided with the datasets, it will be stored as a data member of the {\it MUH1D} object. \\
+% The ExpDataSet provides public methods to access reference publication, name of the observable, interaction
+% type, and the experimental data points, statistical errors, and systematic uncertanties in the form of { \it MUH1D}.
+% See RooMUHistos\cite{roomuhistos} for information of MUH1D object and on accessing its underlying uncertanties.\\
+% Similar functionalities are available to store and access so called "shape-only" data, including statistical and
+% systematic uncertanties and matrices. 
+}
+\end{itemize}
+}  
+\item{A service class {\it IntType} that is used to identify interaction kind (for example, neutrino on 
+neutron or antineutrino on proton) and properly match experiemntal data vs simulated events; this is related
+to the fact that neutrino may interact on a proton or a neutron in the CH target.}
+\item{A family of analyzers (can be expanded) that currently includes: 
+\begin{itemize} 
+\item{ {\it BaseAnalyzer} - base analysis class. It offers general functionalities to store and/or access
+such characteristics as observable and interaction type, as well as analysis results. 
+% MonteCarlo analysis results 
+% are stored in a form of {\it MUH1D} object. Note that systematic uncertainties can be introduced to the MonteCarlo
+% analysis by varying one or several parameters in the simulation; in such case the uncertainties will be stored
+% as a {\it MuVertBand} data member of the MUH1D object that holds the results. 
+{\it BaseAnalyzer} provides an abstract interface that can be implemented by a derived class for 
+a specific analysis. More details are given in the Appendix.
+% These methods are purely virtual: Reset, EndOfRun,and DoIt (which is called by the Analyze method). 
+}
+\item{ {\it Q2QEAnalyzer} - derives from BaseAnalyzer. It can be considered as an example that implements 
+a specific physics case. 
+% that is Q2 analysis of CC QEL scattering of the projectile (neutrino or antineutrino, 
+% depends on the IntType) of the hit nucleon in the CH target (neutron or proton, depends of the {\it IntType}). 
+More details are given in the Appendix.}
+\end{itemize}
+}
+\item{ {\it MCAnalysis} class that holds one or several analyzers, runs a general loop over GENIE events and 
+collectively operate the analyzers that it contains.}
+\item{ {\it ResultsDataMC} and {\it MINERvADataMC} classes.
+\begin{itemize}
+\item{ {\it ResultsDataMC} - base class that provide minimalistic abstract interface for benchmarking comparable
+experimental data and MonteCarlo results, given {\it ExpData} and {\it MCAnalysis} "holders" on input. 
+% Protected method DoIt is purely virtual.
+}
+\item{ {\it MINERvADataMC} - derived from ResultsDataMC and implement a benchmarking example with the use of
+such functionalities of RooMUHisto.
+% as $\chi^{2}$ calculation and/or various image/plotting options. 
+Please see Appendix for additional details.
+}
+\end{itemize}
+}
+\end{itemize}
+
+\section{Appendix}
+
+\subsection{ {\it ExpData} and {\it ExpDataSet} }
+
+As stated earlier, the {\it ExpData} object can collectively store multiple experimental data sets,
+via use of {\it ExpDataSet} objects.
+ 
+The {\it ExpDataSet} object reads and stores a dataset, including information such 
+as reference to the publication, observable, interaction type (e.g. antineutrino on proton, etc.), 
+the data with the errors (statistical and systematic), correlation or covariance matrix (if specified). 
+
+The data together with statistical errors are stored in a form of {\it MUH1D }histogram.
+
+The systematic errors can be added in one of the following way. If only systematic errors are provided for 
+a given dataset, they will be stored as a {\it MUVertBand} data member of the {\it MUH1D } object that holds 
+data points and statistical errors. 
+
+If both systematic errors and correlation matrix are provided, a covariance 
+matrix will be calculated and stored as a data member of the {\it MUH1D } object. If a covariance matrix is 
+provided with the datasets, it will be stored as a data member of the {\it MUH1D} object. \\
+
+The {\it ExpDataSet} provides public methods to access reference publication, name of the observable, interaction
+type, and the experimental data points, statistical errors, and systematic uncertanties in the form of { \it MUH1D}.
+
+See RooMUHistos\cite{roomuhistos} for information of MUH1D object and on accessing its underlying uncertanties.\\
+Similar functionalities are available to store and access so called "shape-only" data, including statistical and
+systematic uncertanties and matrices. 
+
+\subsection{ {\it BaseAnalyzer} and {\it Q2QEAnalyzer} }
+
+As stated earlier, {\it BaseAnalyzer} is a base analysis class that provides several abstract interface methods 
+(public or protected) that can be implemented by a derived class for a specific analysis. 
+
+MonteCarlo analysis results are stored in a form of {\it MUH1D} object. Note that systematic uncertainties can be 
+introduced to the MonteCarlo analysis by varying one or several parameters in the simulation; in such case the 
+uncertainties will be stored as a {\it MuVertBand} data member of the MUH1D object that holds the results. 
+
+Below are several (not all) methods of practical interest for a user who plans to use {\it BaseAnalyzer }
+as a base class:
+\begin{itemize}
+\item{ Init( const IntType\&, const std::string\&, const TH1D\& ) - public virtual method}
+\item{ Analyze( genie::NtpMCEventRecord*, TArrayF* weights=0 ) - public non-virtual method}
+\item{ Reset() - public purely virtual method, must be implemented by derived class}
+\item{ EndOfRun() - public purely virtual method, must be implemented by derived class}
+\item{ DoIt( genie::NtpMCEventRecord*, TArrayF* weights=0 ) - protected purely virtual method, 
+       must be implemented by derived class (this class it called by the Analyze method and 
+       does the actual work for a specific physics case) }
+\end{itemize}
+ 
+The {\it Q2QEAnalyzer} can be considered as an reasonable example analyzer that derives from {\it BaseAnalyzer} 
+and implements a specific physics case, that is Q2 analysis of CC QEL scattering of the projectile (neutrino 
+or antineutrino, depends on the IntType) of the hit nucleon in the CH target (neutron or proton, depends of 
+the {\it IntType}).
+
+It also demonstrates how the Reset(), EndOfRun(), and DoIt() purely methods can be implemented for the specific
+physics analysis in question.
+
+As part of the implementation, it illustreates to extract relevant information from the GENIE event record.
+
+It also illustrates how to use {\it MUH1D} class of the RooMUHistos package\cite{roomuhistos} and how to outfit it
+with {\it MUVertBand} to store MC uncertanties coming from the reweighting procedure.
+
+The source code is reasonably annotated to guide a curious user through.
+
+\subsection{ {\it ResultsDataMC} and {\it MINERvADataMC} }
+
+{\it ResultsDataMC} is a base class that represents an initial, quite minimalistic infrastructure to encapsulates 
+Data-MonteCarlo comparison:
+\begin{itemize}
+\item{  FinalizeResults( const ExpData*, const MCAnalysis* ) - public virtual method; performs basic compatibility 
+checks and calls protected purely virtual method DoIt(...)}
+\item{ DoIt( const ExpDataSet*, const BaseAnalyzer* ) - protected purely virtual method; must be implemented by derived
+class for specific studies}
+\end{itemize}
+
+{\it MINERvADataMC} derives from ResultsDataMC and implement purely virtual method DoIt(...) as a specific Data-MonteCarlo
+benchmarking example with the use of functionalities of RooMUHisto such {\it MUPlotter}. In particular, it illustrates how
+to use {\it MUPlotter} for $\chi^{2}$ calculation as well as various image/plotting options. 
+
+
+\begin{thebibliography}{99}
+\bibitem{geniemanual} https://genie.hepforge.org/manuals/GENIE\_PhysicsAndUserManual\_20130615.pdf
+\bibitem{minerva1} PRL 111, 022052 (2013) and PRL 111, 022501 (2013)
+% \bibitem{minerva2} PRL 111, 022501 (2013)
+\bibitem{roomuhistos} https://github.com/ManyUniverseAna/RooMUHistos
+\end{thebibliography}
+
+\end{document}
