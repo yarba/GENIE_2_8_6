@@ -7,8 +7,8 @@ NAME = all
 MAKEFILE = Makefile
 
 # Include machine specific flags and locations (inc. files & libs)
-# include $(GENIE)/src/make/Make.include
-include Make.include
+include $(GENIE)/src/make/Make.include
+# include Make.include
 
 CXXFLAGS += -g
 
