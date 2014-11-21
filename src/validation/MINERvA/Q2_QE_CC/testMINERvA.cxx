@@ -7,9 +7,11 @@
 
 #include "Messenger/Messenger.h"
 
+#include "RunConfig.h"
 #include "ExpData.h"
 #include "MCAnalysis.h"
 #include "MINERvADataMC.h"
+
 
 // provisions for future development
 //
@@ -19,20 +21,17 @@
 using namespace PlotUtils;
 using namespace genie; // for the GENIE's LOG Messager... 
 
-int main()
+//
+// current usage pattern (example):
+//
+// ./tstMINERvA -d MINERvA_expdata_input.xml
+//
+
+int main( int argc, char ** argv )
 {
    
-   // instantiate the exp.data holder
-   //
-   ExpData* data = new ExpData();
-   
-   // read-in dataset(s)
-   //
-   // NOTE: there'll be run-time configuration in the future
-   //
-   data->ReadExpData( "./exp-MINERvA/nu-Hydrocarbon.data" );
-   data->ReadExpData( "./exp-MINERvA/nubar-Hydrocarbon.data" );
-   
+   RunConfig* run      = new RunConfig( argc, argv );
+         
    // instantiate MC analysis
    //
    MCAnalysis* mcanalysis = new MCAnalysis();
@@ -42,9 +41,9 @@ int main()
    // NOTE: if no matching analyzer for a given exp.observable, 
    //       no analyzer will be added; a warning will be printed out
    //
-   for ( int i=0; i<data->GetNDataSets(); ++i )
+   for ( int i=0; i<run->GetExpData()->GetNDataSets(); ++i )
    {
-      const ExpDataSet* dset   = data->GetExpDataSet( i );
+      const ExpDataSet* dset   = run->GetExpData()->GetExpDataSet( i );
       mcanalysis->AddMCAnalyzer( dset );
    }
 
@@ -78,11 +77,11 @@ int main()
    // final Data to MC comparison, plots, chi2 tests, etc.
    //
    MINERvADataMC* datamc = new MINERvADataMC();   
-   datamc->FinalizeResults( data, mcanalysis );
+   datamc->FinalizeResults( run->GetExpData(), mcanalysis );
 
    delete datamc;
    delete mcanalysis;
-   delete data;
+   delete run;
 
    // use GENIE message logger for (various) printouts
    //

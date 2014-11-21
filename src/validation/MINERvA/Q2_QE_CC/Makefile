@@ -9,7 +9,7 @@ MAKEFILE = Makefile
 # Include machine specific flags and locations (inc. files & libs)
 #
 include $(GENIE)/src/make/Make.include
-# --> debug-dev purposes only !!!   include misc-make-config/Make.include
+# include misc-make-config/Make.include
 
 CXXFLAGS += -g
 
@@ -30,6 +30,7 @@ LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) -L$(ROOMU_SYS)/lib -lplotutils $(CERN_
 VAL_TEST_SOURCES   := ExpData.cxx IntType.cxx MCAnalysis.cxx
 VAL_TEST_SOURCES   += $(wildcard *Analyzer*.cxx)
 VAL_TEST_SOURCES   += $(wildcard *DataMC*.cxx)
+VAL_TEST_SOURCES   += RunConfig.cxx
 # VAL_TEST_SOURCES   += MUH1D.cxx 
 # VAL_TEST_SOURCES   += MUVertErrorBand.cxx 
 # MUPlotter.cxx
