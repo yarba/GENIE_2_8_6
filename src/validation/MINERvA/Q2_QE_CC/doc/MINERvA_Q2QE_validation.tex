@@ -195,10 +195,13 @@ It means that the system will pick 5 variants in the range from -1 to 1, as meas
 The "tweaks" are evenly spaced as (-1, -0.5, 0., 0.5, 1.).
 The "middle tweak" (zero-tweak) corresponds to the nominal value of $M_{a}$.
 
-The name of the output file will be weights\_MaCCQE.root. \\
-Note that there is { \bf no } input argument to explicitly specify the name of the output of {\it grwght1scan}. 
-When reweighting multiple samples, make sure to manually rename the output of each run.
-
+By default, the name of the output file will be weights\_MaCCQE.root. \\
+If you wish to redirect the output of {\it grwght1scan} to a particular file, please also give the name
+in the use "-o" input field, for example:
+\begin{itemize}
+\item { {\it grwght1scan } -f gntp.1.ghep.root -s MaCCQE -t 5 -o nu-CH-weights-MaCCQE.root }
+\end{itemize}
+ 
 In general, approximetely the same amount time is needed to reweight events as it takes to generate them.
 
 \section{The Experimental Data}
