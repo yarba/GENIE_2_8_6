@@ -30,6 +30,12 @@ RunConfig::RunConfig( int argc, char ** argv )
         exit(1);
      }
   }
+  else
+  {
+     LOG("gvldtest", pFATAL)
+        << "NO validation dataset is provided\n Useage format: ./tstMINERvA -d <dataset-spec>.xml \n exit";
+     exit(1);
+  }
   
   //
   // provisions for future development

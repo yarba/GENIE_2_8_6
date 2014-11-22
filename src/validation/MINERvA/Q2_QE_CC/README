@@ -1,7 +1,18 @@
-This writeup will serve as a "rough" version of a mini-guide until we produce a a better document.
 
-It contains minimal instructions for modeling with GENIE interactions of nu (pid=14) on Hydrocarbon 
-and comparing simulated results vs measurements by MINERvA (arXiv:1305.2243; PRL 111 022502 (2013)).
+This validation application benchmarks GENIE's Q2 QECC predictions vs MINERvA measurements. 
+
+The write-up contains very short information about the application, together with several 
+practical tips/instructions.
+
+More detailed information is provided in the MINERvA_Q2QE_validation document.
+The LaTex vesrion of the document is stored as
+doc/MINERvA_Q2QE_validation.tex
+
+To compose a PDF document, please do as follows:
+cd doc
+latex MINERvA_Q2QE_validation
+dvipdf MINERvA_Q2QE_validation
+
 
 1. General Info and Setup
 
@@ -29,19 +40,6 @@ Now you should be reasonably set to build and run the application.
 
 We use the RooMUHisto framework to display and compare the experimental data and/or simulated results.
 
-WARNING: The RooMUHisto framework is still under development. This application should be considered as
-it's beta-testing. Some features of the RooMUHisto framework may still present usage problems.
-
-The framework is freely available from the GitHub:
-https://github.com/ManyUniverseAna/RooMUHistos
-
-In addition to a variety of plotting utilities, it also offers several functionalities for a statistical 
-analysis of the simulated results vs experimental data.
-
-The package is supplied with a small README that offers startup tips.
-
-The source code of the package is also outfitted with doxygen-style documentation.
-
 Minimal instructions are as follow:
 
 a) choose where you want to install the package
@@ -57,25 +55,11 @@ If you wish, yu can also build and try examples
 h) cd ../macros
 i) make
 
-NOTE: There's also a forked revision of RooMUHistos at the following URL:
-https://github.com/yarba/RooMUHistos
-
-In general, the plan is to merge any changes into the principal vesrion of RooMUHistos.
-However, there maybe times when the forked revision may contain some slight modifications 
-vs the "principal" one.
-
 
 3. Generate GENIE sample
 
-One can generate a desired GENIE sample using pre-fabricated gengev utility.
-
-Instruction for using prefabricated gevgen utility start of page 69 of 
-the GENIE Physics and User's Manual which can be found here:
-https://genie.hepforge.org/manuals/GENIE_PhysicsAndUserManual_20130615.pdf
 
   -- Splines
-
-One of the components needed for GENIE event generation are splines.
 
 For this particular application you can download the vA splines from hepforge.
 
@@ -89,8 +73,6 @@ Example:
   
 MINERvA target is made of Hydrocarbon (CH), which should be treated as a composite target.
 
-In the target definition on input to gevgen we use fractional atomic weights.
-
   -- Flux file
   
 The MINERvA flux files for nu and nubar have been extracted from the MINERvA publications.
@@ -98,7 +80,7 @@ We have stored them with the application as
 ./flux-MINERvA/nu-flux-MINERvA.data
 ./flux-MINERvA/nubar-flux-MINERvA.data
 
-  -- Running gengev with the neutrino projectile
+  -- Running gengev with the neutrino projectile on Hydrocarbon tahget
 
 gevgen -r 1 -n 100000 -p 14 -e 1.5,10 -t1000010010[0.077418],1000060120[0.922582] \
 --cross-sections ./splines/gxspl-vA-v2.8.0.xml \
@@ -111,105 +93,34 @@ Based on the contents of the MINERvA flux file, the neutrino energy range is set
 The run number is 1 ( -r 1 ). 
 Because the the run number is 1 in this case, the output file will be named gntp.1.ghep.root 
 (in general, the naming convenstion is gntp.<run-number>.ghep.root).
-Unfortunately, there's no input argument to explicitly name the output of gevgen.
-You have to be careful when generating multiple sample as you always have to make sure that
-the run number is unique (unless you wish to override). 
-
-If you wish to generate a nubar sample, please use appropriate input arguments, as follows:
--r <Unique-ID-of-your-choice>
--p -14
--f ./flux-MINERvA/nubar-flux-MINERvA.data
-The target definition and the cross-sections are the same as in generating neutrino sample.
-
-The generation time is going to vary depending on your CPU; for example, it takes ~30-40min 
-of wall clock time on cluck.fnal.gov (AMD Opteron(tm) Processor 6136).
-The output file size is going to be ~80Mb. 
-If you need a larger statistics, please plan your resources accordingly.
-In case you wish to split the statistics into multiple jobs, please bear in mind the [ -seed YourSeed ] 
-input argument of the gevgen utility, to set appropriate seeds for your parallel jobs.
-Also make sure to set a unique run number of each of the fractional jobs.
-
-Just in case, below is some info from MINERvA Geant-based MC, as we've used it as guidance
-to define the Hydrocarbon target.
------------------------------------------------------
-
-Hydrocarbon as it's defined in MINERvA Geant4 Simulation (GDML desc.);
-they're using fractional atomic weights:
-
-<material formula=" " name="sMinervaPlasticScint0x116c9670" >
-   <D value="1.043" />
-   <fraction n="0.077418" ref="sHydrogen0x116bf1b0" />
-   <fraction n="0.922582" ref="sCarbon0x116be670" />
-</material>
-<element Z="1" formula=" " name="sHydrogen0x116bf1b0" >
-   <atom value="1.00794" />
-</element>
-<element Z="6" formula=" " name="sCarbon0x116be670" >
-   <atom value="12.011" />
-</element>
-
------------------------------------------------------
 
 4. GENIE Event Reweighting
 
-GENIE Event Reweighting machinery is described in GENIE manual, pp.129-156.
-
-In this application we varied the Axial mass for CC quasi-elastic.
 
 We have used the standard pre-fabricated grwght1scan utility that is available with the GENIE install. 
+
+In this application we varied the Axial mass for CC quasi-elastic scattering:
 
 As an input to it we have used (a copy of) pre-generated GENIE sample.
 
 Example usage is as follows:
 
-grwght1scan -f gntp.1.ghep.root -s MaCCQE -t 5
+grwght1scan -f gntp.1.ghep.root -s MaCCQE -t 5 -o <output-file-name>.root
 
 Please note that "MaCCQE" is the name of the GENIE parameter that describes the axial mass for CC QE.
 For the list of other names, please see $GENIE/src/ReWeight/GSyst.h 
 
-We have specified 5 "tweak dial" for this parameter. It means that the system will pick 5 variants in the
-range from -1 to 1. 
-
-The name of the output file will be weights_MaCCQE.root.
-Note that there's no input argument to explicitly specy the name of the output of grwght1scan.
-When reweighting multiple samples, make sure to manually rename the output of each run.
-
 5. The Experimental Data
-
-The experimental data have been extracted from the MINERvA publication on nutrino quasi-elastic scattering
-off neutrons on a Hydrocarbon target (arXiv:1305.2243; PRL 111 022502 (2013)). 
 
 The data are stored in a plain ASCII file in the dedicated subdirectory:
 ./exp-MINERvA/nu-Hydrocarbon.data
-
-For testing purposes there's also a "reduced" version of the data file
-./exp-MINERvA/nu-Hydrocarbon-tst.dat
-
-It does NOT include the correlation matrix. Because of this, the application will make an "error band" 
-using the systematic errors.
+./exp-MINERvA/nubar-Hydrocarbon.data
 
 
-6. The Validation Application
-
-At present, the validation application consists of the following:
-
--- the experimental data reader/holder ExpData class
--- a service class IntType that is used to identify interaction kind (for example, nu on neutron
-   or a nubar on proton) and properly match experiemntal data vs simulated events; this is related
-   to the fact that neutrino may interact on a proton or a neutron in the CH target
--- a family of analyzers (can be expanded) that currently includes the base class BaseAnalyzer 
-   and the Q2QEAnalyzer that derives from BaseAnalyzer and implements specific physics case,
-   that is Q2 analysis of QEL neutrino scattering of neutrons in the CH target
--- MCAnalysis class runs a general loop over GENIE events and can collectively operate a number
-   of analyzers that are added to it
--- the main program testMINERvA that uses the above mentioned software components, together with
-   the functionalities of the MUPlotter from RooMUHisto packages (see paragraph 2). 
-
-7. Building the Application
+6. Building the Validation Application
 
 Before building the validation application itself, one needs to build the RooMUHistos package,
-as it'll need to be linked.
-Please use the README instructions that come with RooMUHistos.
+as it'll need to be linked (see earlier in this write-up)
 
 Once RooMUHisto is configured and built, the validation application can be build with the help of
 the provided Makefile; simply type "make".
@@ -218,16 +129,15 @@ The resulting executable will be tstMINERvA.
 
 8. Running the Application
 
-At present the executable does NOT require any input arguments (the exp.data set, the path 
-to GENIE sample, and the path to GENIE re-weighting output are currently hardcoded).
+At present the application allows to specify the experimental data at run time.
+
+The path  to GENIE sample and the path to GENIE re-weighting files are currently hardcoded.
+This will change in the near future.
 
 you can run it as follows:
-./tstMINERvA
+./tstMINERvA -d MINERvA_expdata_input.xml
 
-However, in the nearest future we'll outfit the application with the functionalities to process 
-multiple datasets and multiple GENIE samples; thus the interface may change soon. 
-
-9. Output
+8. Output
 
 At present, the application produces 4 (four) GIF-formatted images:
 -- test1.gif - an overlay of MINERvA data and the GENIE predicions, including an uncertainty band on the MC,

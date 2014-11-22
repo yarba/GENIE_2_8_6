@@ -196,8 +196,7 @@ The "tweaks" are evenly spaced as (-1, -0.5, 0., 0.5, 1.).
 The "middle tweak" (zero-tweak) corresponds to the nominal value of $M_{a}$.
 
 By default, the name of the output file will be weights\_MaCCQE.root. \\
-If you wish to redirect the output of {\it grwght1scan} to a particular file, please also give the name
-in the use "-o" input field, for example:
+If you wish a particular output file name, please specify it in the "-o" input field, for example:
 \begin{itemize}
 \item { {\it grwght1scan } -f gntp.1.ghep.root -s MaCCQE -t 5 -o nu-CH-weights-MaCCQE.root }
 \end{itemize}
@@ -221,34 +220,32 @@ The validation application performs analysis of the charged-current quasi-elasti
 or antineutrino in the CH target as it is modeled by GENIE, and compares GENIE predisions with the
 experimental results as measured by the MINERvA collaboration.
 
-At present, the application analyses two (2) GENIE samples combined with their respective reweighting
-outputs, that are descrbed in earlier sections.
+At present, the application analyses two (2) GENIE samples, including reweighting results.
 
-The application builds with a single command:
+The application builds with a single command: 
 make
 
-The resulting executable is $tstMINERvA$, and it executes as follows:
-./tstMINERvA
+The resulting executable is $tstMINERvA$, and it runs as follows: \\
+./tstMINERvA -d MINERvA\_expdata\_input.xml
 
 The source code of all classes is fairly compact and reasonably self-explainatory.
 
-As of now, the application does {\bf not } require any input argument, as the use of the datasets and
-of the GENIE samples are hardcoded; {\bf this will change in the future}.
+As of now, the application requires on input the configuration XML file that specifies the experimental
+datasets to be used. The GENIE samples are hardcoded and the corresponding re-weighted outputs are currently 
+hardcoded. {\bf This will change in the future}.
 
 At present, the validation application consists of the following:
 \begin{itemize}
 \item{the main program {\it testMINERvA.cxx}.
 A schematic workflow is as follows: \\
 {\small 
-int main() \\
+int main( int argc, char ** argv ) \\
 \{   \\
-ExpData* data = new ExpData(); \\
-data$->$ReadExpData( "./exp-MINERvA/nu-Hydrocarbon.data" ); \\
-data$->$ReadExpData( "./exp-MINERvA/nubar-Hydrocarbon.data" ); \\
+RunConfig* run      = new RunConfig( argc, argv ); \\
 MCAnalysis* mcanalysis = new MCAnalysis(); \\
-   for ( int i=0; i$<$data$->$GetNDataSets(); ++i ) \\
+   for ( int i=0; i$<$run$->$GetExpData()$->$GetNDataSets(); ++i ) \\
    \{ \\
-      const ExpDataSet* dset   = data$->$GetExpDataSet( i ); \\
+      const ExpDataSet* dset   = run$->$GetExpData()$->$GetExpDataSet( i ); \\
       mcanalysis$->$AddMCAnalyzer( dset ); \\
    \} \\
    mcanalysis$->$Reset(); \\
@@ -261,7 +258,7 @@ MCAnalysis* mcanalysis = new MCAnalysis(); \\
    datamc$->$FinalizeResults( data, mcanalysis ); \\
    delete datamc; \\
    delete mcanalysis; \\
-   delete data; \\
+   delete run; \\
    return 0; \\
 \} \\
 }
@@ -278,17 +275,6 @@ dataset, by the dataset's serial number of by its name.}
 relevant information, such a reference to the publication, observable, interaction type, the data with the 
 uncertainties, correlation or covariance matrix (if specified). It also provides public methods to access 
 the stored information. Additional details are given in the Appendix.
-% The data together with statistical errors are stored in a form of {\it MUH1D }histogram.
-% The systematic errors can be added in one of the following way. If only systematic errors are provided for 
-% a given dataset, they will be stored as a {\it MUVertBand} data member of the {\it MUH1D } object that holds 
-% data points and statistical errors. If both systematic errors and correlation matrix are provided, a covariance 
-% matrix will be calculated and stored as a data member of the {\it MUH1D } object. If a covariance matrix is 
-% provided with the datasets, it will be stored as a data member of the {\it MUH1D} object. \\
-% The ExpDataSet provides public methods to access reference publication, name of the observable, interaction
-% type, and the experimental data points, statistical errors, and systematic uncertanties in the form of { \it MUH1D}.
-% See RooMUHistos\cite{roomuhistos} for information of MUH1D object and on accessing its underlying uncertanties.\\
-% Similar functionalities are available to store and access so called "shape-only" data, including statistical and
-% systematic uncertanties and matrices. 
 }
 \end{itemize}
 }  
@@ -299,13 +285,8 @@ to the fact that neutrino may interact on a proton or a neutron in the CH target
 \begin{itemize} 
 \item{ {\it BaseAnalyzer} - base analysis class. It offers general functionalities to store and/or access
 such characteristics as observable and interaction type, as well as analysis results. 
-% MonteCarlo analysis results 
-% are stored in a form of {\it MUH1D} object. Note that systematic uncertainties can be introduced to the MonteCarlo
-% analysis by varying one or several parameters in the simulation; in such case the uncertainties will be stored
-% as a {\it MuVertBand} data member of the MUH1D object that holds the results. 
 {\it BaseAnalyzer} provides an abstract interface that can be implemented by a derived class for 
 a specific analysis. More details are given in the Appendix.
-% These methods are purely virtual: Reset, EndOfRun,and DoIt (which is called by the Analyze method). 
 }
 \item{ {\it Q2QEAnalyzer} - derives from BaseAnalyzer. It can be considered as an example that implements 
 a specific physics case. 
