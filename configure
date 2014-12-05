@@ -52,6 +52,7 @@ if(($match = grep(/--help/i, @ARGV)) > 0) {
   print "    libxml2-lib       Path to libxml2 library      always needed                       (if unset: tries to auto-detect it) \n";
   print "    log4cpp-inc       Path to log4cpp includes     always needed                       (if unset: tries to auto-detect it) \n";
   print "    log4cpp-lib       Path to log4cpp library      always needed                       (if unset: tries to auto-detect it) \n\n";
+  print "    roomuhisto        Path to RooMUHistos          needed if you --enable-roomuhistos  (if unset: tries to auto-detect it) \n\n";
   print "If the printout was too long then pipe it through a pager, eg: \n";
   print "./configure --help | more \n";
   exit 0;
@@ -141,6 +142,10 @@ my $gopt_enable_rwght            = "NO";
 my $gopt_enable_fastsim          = "NO";
 my $gopt_enable_masterclass      = "NO";
 
+# RooMUHistos
+#
+my $gopt_enable_roomuhistos      = "NO";
+
 # Check configure's command line arguments for non-default values
 #
 if(($match = grep(/--enable-profiler/i,         @ARGV)) > 0) { $gopt_enable_profiler         = "YES"; }
@@ -168,6 +173,10 @@ if(($match = grep(/--enable-masterclass/i,      @ARGV)) > 0) { $gopt_enable_mast
 
 my $gopt_with_cxx_debug_flag="";
 if($gopt_enable_debug eq "YES") { $gopt_with_cxx_debug_flag = "-g"; }
+
+# RooMUHistos
+#
+if(($match = grep(/--enable-roomuhistos/i,      @ARGV)) > 0) { $gopt_enable_roomuhistos      = "YES"; }
 
 
 # Warnings for recently modified configuration options
@@ -477,6 +486,43 @@ if(! -d $gopt_with_log4cpp_lib) {
   exit 1;
 }
 
+# RooMUHistos
+#
+my $gopt_with_roomuhistos_path = "";
+if($gopt_enable_roomuhistos eq "YES") {
+  if(($match = grep(/--with-roomuhistos-path/i, @ARGV)) > 0) { 
+    $options=~m/--with-roomuhistos-path=(\S*)/i;
+    $gopt_with_roomuhistos_path = $1;
+  }
+  if(! -d $gopt_with_roomuhistos_path)  {
+    print "\n*** Warning *** RooMUHistos has been enabled but you didn't specify the RooMUHistos path \n";
+  }
+  # if it was not set, try to pick it up from the environment
+  if($gopt_with_roomuhistos_path eq "" && defined $ENV{'ROOMU_SYS'}) { 
+     $gopt_with_roomuhistos_path = $ENV{'ROOMU_SYS'}; 
+     print "The \$ROOMU_SYS env var is defined. I will pick that and use --with-roomuhistos-path=$gopt_with_roomuhistos_path\n";
+  }
+  # if it still not set, try autodetecting it
+  if(! -d $gopt_with_roomuhistos_path && $auto_detect)  {
+    print "Auto-detecting the RooMUHistos include path...\n";
+    $matched = auto_detect("PlotUtils");
+    print "$gopt_with_roomuhistos_path  \n";
+    if( $matched=~m/(\S*)\/PlotUtils/i ) {
+       $gopt_with_roomuhistos_path = $1;
+    }
+    print "Setting --with-roomuhistos-path=$gopt_with_roomuhistos_path\n";
+  }
+  # check
+  my $file = "$gopt_with_roomuhistos_path/PlotUtils/MUH1D.h";
+  if(! -e $file) {
+     print "*** Error *** You need to specify the RooMUHistos path using --with-roomuhistos-path=/some/path/\n";
+     print "*** Error *** Otherwise, you should --disable-lhapdf\n\n";
+     exit 1;
+  }
+}
+
+
+
 # Save config options
 #
 print MKCONF "GOPT_ENABLE_PROFILER=$gopt_enable_profiler\n";
@@ -512,6 +558,11 @@ print MKCONF "GOPT_WITH_LIBXML2_INC=$gopt_with_libxml2_inc\n";
 print MKCONF "GOPT_WITH_LIBXML2_LIB=$gopt_with_libxml2_lib\n";
 print MKCONF "GOPT_WITH_LOG4CPP_INC=$gopt_with_log4cpp_inc\n";
 print MKCONF "GOPT_WITH_LOG4CPP_LIB=$gopt_with_log4cpp_lib\n";
+
+# RooMUHistos
+#
+print MKCONF "GOPT_ENABLE_ROOMUHISTOS=$gopt_enable_roomuhistos\n";
+print MKCONF "GOPT_WITH_ROOMUHISTOS_PATH=$gopt_with_roomuhistos_path\n";
 
 close(MKCONF);
 
