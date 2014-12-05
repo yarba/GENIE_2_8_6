@@ -11,7 +11,7 @@ MAKEFILE = Makefile
 include $(GENIE)/src/make/Make.include
 # include misc-make-config/Make.include
 
-CXXFLAGS += -g
+# --> CXXFLAGS += -g
 
 GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
 
@@ -22,10 +22,15 @@ GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
 #
 # ROOMU_SYS = /home/yarba_j/work/genie-work-area/RooMUHistos
 
-INCLUDES += -I$(ROOMU_SYS) 
-INCLUDES += -I$(ROOMU_SYS)/PlotUtils
+# INCLUDES += -I$(ROOMU_SYS) 
+# INCLUDES += -I$(ROOMU_SYS)/PlotUtils
+#
+INCLUDES += -I$(GOPT_WITH_ROOMUHISTOS_PATH)
+INCLUDES += -I$(GOPT_WITH_ROOMUHISTOS_PATH)/PlotUtils
 
-LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) -L$(ROOMU_SYS)/lib -lplotutils $(CERN_LIBRARIES)
+# LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) -L$(ROOMU_SYS)/lib -lplotutils $(CERN_LIBRARIES)
+#
+LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) -L$(GOPT_WITH_ROOMUHISTOS_PATH)/lib -lplotutils $(CERN_LIBRARIES)
 
 VAL_TEST_SOURCES   := ExpData.cxx IntType.cxx MCAnalysis.cxx
 VAL_TEST_SOURCES   += $(wildcard *Analyzer*.cxx)
@@ -42,14 +47,14 @@ all:    testMINERvA
 
 testMINERvA: FORCE
 	$(CXX) $(CXXFLAGS) -c $(VAL_TEST_SOURCES) $(INCLUDES)
-	$(LD) $(LDFLAGS) $(VAL_TEST_OBJECTS) $(LIBRARIES) -o tstMINERvA
+	$(LD) $(LDFLAGS) $(VAL_TEST_OBJECTS) $(LIBRARIES) -o  $(GENIE_BIN_PATH)/tstMINERvA
 
 purge: FORCE
 	$(RM) *.o *~ core
 
 clean: FORCE
 	$(RM) *.o *~ core
-	$(RM) ./tstMINERvA
+	$(RM) $(GENIE_BIN_PATH)/tstMINERvA
 
 distclean: FORCE
 	$(RM) $(GENIE_BIN_INSTALLATION_PATH)/tstMINERvA
