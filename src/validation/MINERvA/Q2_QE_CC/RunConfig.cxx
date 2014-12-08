@@ -33,7 +33,7 @@ RunConfig::RunConfig( int argc, char ** argv )
   else
   {
      LOG("gvldtest", pFATAL)
-        << "NO validation dataset is provided\n Useage format: ./tstMINERvA -d <dataset-spec>.xml \n exit";
+        << "NO validation dataset is provided\n Useage format: ./gvld_MINERvA_Q2_QE_CC -d <dataset-spec>.xml \n exit";
      exit(1);
   }
   

@@ -125,7 +125,7 @@ as it'll need to be linked (see earlier in this write-up)
 Once RooMUHisto is configured and built, the validation application can be build with the help of
 the provided Makefile; simply type "make".
 
-The resulting executable will be tstMINERvA.
+The resulting executable will be gvld_MINERvA_Q2_QE_CC.
 
 8. Running the Application
 
@@ -135,23 +135,28 @@ The path  to GENIE sample and the path to GENIE re-weighting files are currently
 This will change in the near future.
 
 you can run it as follows:
-./tstMINERvA -d MINERvA_expdata_input.xml
+./gvld_MINERvA_Q2_QE_CC -d MINERvA_expdata_input.xml
 
 8. Output
 
-At present, the application produces 4 (four) GIF-formatted images:
--- test1.gif - an overlay of MINERvA data and the GENIE predicions, including an uncertainty band on the MC,
-               that come from varirying M_a parameter of GENIE (re-weighting); the chi2/ndf on the CV histo
-	       is calculated using the data error matrix
--- test2.gif - an overlay of MINERvA data and the GENIE predicions, where the uncertainty band is represented
-               but several color-coded histogram that the band is composed of; the chi2/ndf on the CV histo
-	       is calculated using the data error matrix; the chi2/ndf is also calculated for each variant in
-	       the band, also using the data error matrix 
--- test3.gif - Data/MC ratio plot, including the uncertainty band on the MC: the chi2/ndf on the CV histo is
-               calculated using the uncertainties on the MC (from re-weighting)
--- test4.gif - an overlay of MINERvA and the GENIE predictions, including the uncertaintiy band on the MC,
-               all in the form of "shape-only"; the chi2/ndf is also calculated with the "shape-only" technique,
-	       using the data shape-only error matrix
+At present, the application produces 4 (four) GIF-formatted images per projectile-nucleon configuration:
+-- MINERvA-<projectile>-<nucleon>-Q2QE-1.gif - an overlay of MINERvA data and the GENIE predicions, including 
+                                               an uncertainty band on the MC, that come from varirying M_a 
+					       parameter of GENIE (re-weighting); the chi2/ndf on the CV histo
+	                                       is calculated using the data error matrix
+-- MINERvA-<projectile>-<nucleon>-Q2QE-2.gif - an overlay of MINERvA data and the GENIE predicions, where 
+                                               the uncertainty band is represented but several color-coded 
+					       histogram that the band is composed of; the chi2/ndf on the 
+					       CV histo is calculated using the data error matrix; the chi2/ndf 
+					       is also calculated for each variant in the band, also using 
+					       the data error matrix 
+-- MINERvA-<projectile>-<nucleon>-Q2QE-3.gif - Data/MC ratio plot, including the uncertainty band on the MC: 
+                                               the chi2/ndf on the CV histo is calculated using the uncertainties 
+					       on the MC (from re-weighting)
+-- MINERvA-<projectile>-<nucleon>-Q2QE-4.gif - an overlay of MINERvA and the GENIE predictions, including 
+                                               the uncertaintiy band on the MC, all in the form of "shape-only"; 
+					       the chi2/ndf is also calculated with the "shape-only" technique,
+	                                       using the data shape-only error matrix
 
 
 

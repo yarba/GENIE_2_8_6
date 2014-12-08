@@ -254,6 +254,22 @@ ifdef GOPT_ENABLE_DOXYGEN_DOC
 endif
 
 #-------------------------------------------------------------------
+#                             RooMUHistos
+#-------------------------------------------------------------------
+
+ROOMU_DIR = 
+ROOMU_LIB_DIR =
+
+ifeq ($(strip $(GOPT_ENABLE_ROOMUHISTOS)),YES) 
+
+ROOMU_DIR  = $(GOPT_WITH_ROOMUHISTOS_PATH)
+ROOMU_LIB_DIR = $(GOPT_WITH_ROOMUHISTOS_PATH)/lib
+ROOMU_LIBS = -L$(ROOMU_LIB_DIR) -lplotutils
+
+endif
+
+
+#-------------------------------------------------------------------
 #                       Some global variables
 #-------------------------------------------------------------------
 MAKE   := gmake

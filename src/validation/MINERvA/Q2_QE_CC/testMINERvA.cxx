@@ -24,7 +24,7 @@ using namespace genie; // for the GENIE's LOG Messager...
 //
 // current usage pattern (example):
 //
-// ./tstMINERvA -d MINERvA_expdata_input.xml
+// ./gvld_MINERvA_Q2_QE_CC -d MINERvA_expdata_input.xml
 //
 
 int main( int argc, char ** argv )
