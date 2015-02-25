@@ -55,7 +55,7 @@ void BaseAnalyzer::Init( const IntType& type, const std::string& oname, const TH
 
 }
 
-void BaseAnalyzer::Analyze( NtpMCEventRecord* mcrec, TArrayF* weights )
+void BaseAnalyzer::Analyze( NtpMCEventRecord* mcrec, RWRecord* rwrec )
 {
  
    EventRecord&   event      = *(mcrec->event); 
@@ -73,7 +73,7 @@ void BaseAnalyzer::Analyze( NtpMCEventRecord* mcrec, TArrayF* weights )
    // actual work is done here
    // (this method is purely virtual)
    //
-   DoIt( mcrec, weights );
+   DoIt( mcrec, rwrec );
    
    return;
 

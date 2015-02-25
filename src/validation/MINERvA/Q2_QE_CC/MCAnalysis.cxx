@@ -8,7 +8,6 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include "TH1.h"
 
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepParticle.h"
@@ -26,11 +25,12 @@
 #include "Q2QEAnalyzer.h"
 #include "ExpData.h"
 
+#include "RWRecord.h"
 
 using namespace genie;
 
 MCAnalysis::MCAnalysis() 
-   : fEvtTree(0), fMCRec(0) 
+   : fEvtTree(0), fMCRec(0), fRWTree(0), fRWRec(0) 
 { 
 }
 
@@ -63,7 +63,9 @@ void MCAnalysis::AddMCAnalyzer( const ExpDataSet* dset )
       return;
    }
    
-   fAnalyzers.back()->Init( dset->GetInteraction(), oname, (dset->GetDataHisto()).GetCVHistoWithStatError() ); 
+   fAnalyzers.back()->Init( dset->GetInteraction(), 
+                            oname, (
+			    dset->GetDataHisto()).GetCVHistoWithStatError() ); 
       
    return;
 
@@ -97,7 +99,7 @@ const BaseAnalyzer* MCAnalysis::GetMCAnalyzer( const ExpDataSet* dset ) const
 
 }
 
-void MCAnalysis::Analyze( const std::string& sample, const std::string& rwsample )
+void MCAnalysis::Analyze( const std::string& sample )
 {
 
    // for more info of GENIE event/analysis see GENIE manual, chapter 6 (p.101) 
@@ -116,18 +118,6 @@ void MCAnalysis::Analyze( const std::string& sample, const std::string& rwsample
       return;
    }
 
-   TFile* rwfin = 0;
-   if ( rwsample != "" )
-   {
-      rwfin = new TFile( rwsample.c_str(), "READ" );
-      if ( !rwfin )
-      {
-         LOG("gvldtest", pERROR) 
-            << "Invalid Genie Reweighted sample " << sample;
-         return;
-      }
-   }
-   
    // connect to event tree 
    //
    fEvtTree = dynamic_cast <TTree *>( fin->Get("gtree")  );
@@ -151,24 +141,13 @@ void MCAnalysis::Analyze( const std::string& sample, const std::string& rwsample
       return;
    }
    
-   // FIXME !!!
-   // TMP scheme - assumes re-weighting by 1 variable only
+   // Connect the reweighting tree (if any)
    //
-   TTree*   WtTree   = 0;
-   TArrayF* TwkDials = 0;
-   TArrayF* Weights  = 0;
-   
-   if ( rwfin )
+   fRWTree = dynamic_cast<TTree*>( fin->Get("reweighting") );
+   if ( fRWTree )
    {
-      WtTree = dynamic_cast<TTree*>( rwfin->Get("MaCCQE") );
-      WtTree->SetBranchAddress( "twkdials", &TwkDials );
-      WtTree->SetBranchAddress( "weights",  &Weights );
-      if ( !Weights )
-      {
-         LOG("gvldtest", pERROR) << "Null Weights record";
-         return;         
-      }
-      fEvtTree->AddFriend( WtTree );
+      fEvtTree->AddFriend( fRWTree );
+      fRWTree->SetBranchAddress( "MaCCQE", &fRWRec );
    }
    
    // find out how many generated events are in the tree 
@@ -196,7 +175,7 @@ void MCAnalysis::Analyze( const std::string& sample, const std::string& rwsample
       
       for ( unsigned int i=0; i<fAnalyzers.size(); ++i )
       {
-         fAnalyzers[i]->Analyze( fMCRec, Weights );
+         fAnalyzers[i]->Analyze( fMCRec, fRWRec );
       }
       
       //
@@ -210,20 +189,19 @@ void MCAnalysis::Analyze( const std::string& sample, const std::string& rwsample
       XSec += xsec;
             
       fMCRec->Clear();
-      
-      // FIXME !!! Do I need to clear out weights and tweak dials ???
-      
+      if ( fRWRec ) fRWRec->Reset();
+            
    } // end loop over NEvents
 
    XSec /= NEvents;
 
    fin->Close();
    delete fin;
-   if ( rwfin )
-   {
-      rwfin->Close();
-      delete rwfin;
-   }
+   
+   fEvtTree = 0;
+   fMCRec = 0;
+   fRWTree  = 0;
+   fRWRec = 0;
 
    return;
 

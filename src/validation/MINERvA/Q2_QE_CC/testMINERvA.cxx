@@ -61,12 +61,14 @@ int main( int argc, char ** argv )
    //
    // NOTE: there'll be run-time configuration in the future
    //
-//   mcanalysis->Analyze( "./genie-samples-reweight/gntp.1.ghep.root", "./genie-samples-reweight/nu-CH-weights-MaCCQE.root" );
-//   mcanalysis->Analyze( "./genie-samples-reweight/gntp.2.ghep.root", "./genie-samples-reweight/nubar-CH-weights-MaCCQE.root" );
-   mcanalysis->Analyze( "/data/g4/tmp-genie-samples/nu-Hydrocarbon/100K/gntp.1.ghep.root", 
-                        "/data/g4/tmp-genie-samples/nu-Hydrocarbon/100K/nu-CH-weights-MaCCQE.root");
-   mcanalysis->Analyze( "/data/g4/tmp-genie-samples/nubar-Hydrocarbon/100K/gntp.2.ghep.root", 
-                        "/data/g4/tmp-genie-samples/nubar-Hydrocarbon/100K/nubar-CH-weights-MaCCQE.root");
+   const GSimFiles* mcfiles = run->GetSimFilesHandler();
+   int imodel = 0 ; // this is a hack ! there may be several models(versions) of GENIE !!! (regression test)
+   //
+   for ( unsigned int imc=0; imc<mcfiles->EvtFileNames(imodel).size(); ++imc )
+   {
+//      mcanalysis->Analyze( "/scratch-shared/yarba_j/tmp-genie/nu-Hydrocarbon/rw-testing/100K/gntp.1.ghep.root" );
+      mcanalysis->Analyze( mcfiles->EvtFileNames(imodel)[imc] );
+   }
 
    //
    // finalize MC results

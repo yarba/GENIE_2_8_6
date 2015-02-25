@@ -16,9 +16,26 @@ RunConfig::RunConfig( int argc, char ** argv )
 {
 
   fLineParser = new CmdLnArgParser( argc, argv );
-  
+  fGSimFiles  = new GSimFiles( false, 10 ); // no chain; max 10 models/versions
   fExpData    = new ExpData();
 
+  if( fLineParser->OptionExists('g') ) 
+  {
+     string inputs = fLineParser->ArgAsString('g');
+     bool ok = fGSimFiles->LoadFromFile(inputs);
+     if(!ok) { 
+        LOG("gvldtest", pFATAL) 
+          << "Could not read validation program inputs from: " << inputs;
+        exit(1);
+     }
+  }
+  else
+  {
+     LOG("gvldtest", pFATAL)
+        << "NO MC(GENIE) sample is provided\n Useage format: ./gvld_MINERvA_Q2_QE_CC -g <mc-spec>.xml -d <dataset-spec>.xml \n exit";
+     exit(1);
+  }
+    
   if ( fLineParser->OptionExists('d') )
   {
      string dsets = fLineParser->ArgAsString('d');
@@ -33,30 +50,17 @@ RunConfig::RunConfig( int argc, char ** argv )
   else
   {
      LOG("gvldtest", pFATAL)
-        << "NO validation dataset is provided\n Useage format: ./gvld_MINERvA_Q2_QE_CC -d <dataset-spec>.xml \n exit";
+        << "NO validation dataset is provided\n Useage format: ./gvld_MINERvA_Q2_QE_CC -g <mc-spec>.xml -d <dataset-spec>.xml \n exit";
      exit(1);
   }
   
-  //
-  // provisions for future development
-  //
-  if( fLineParser->OptionExists('g') ) 
-  {
-     string inputs = fLineParser->ArgAsString('g');
-//     bool ok = fGSimFiles->LoadFromFile(inputs);
-//     if(!ok) { 
-//        LOG("gvldtest", pFATAL) 
-//          << "Could not read validation program inputs from: " << inputs;
-//        exit(1);
-//     }
-  }
-
 }
 
 RunConfig::~RunConfig()
 {
 
    delete fLineParser;
+   delete fGSimFiles;
    delete fExpData;
 
 }

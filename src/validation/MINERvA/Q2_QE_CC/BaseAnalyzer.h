@@ -4,17 +4,14 @@
 #include <string>
 #include "IntType.h"
 
-// #include "TH1.h"
-//
 #include "PlotUtils/MUH1D.h"
 
 class TTree;
-class TArrayF;
-// class TH1D;
 
 namespace genie {
 class NtpMCEventRecord;
 }
+class RWRecord;
 
 class BaseAnalyzer
 {
@@ -27,7 +24,7 @@ class BaseAnalyzer
       virtual ~BaseAnalyzer();
 
       virtual void Init( const IntType&, const std::string&, const TH1D& );
-      void Analyze( genie::NtpMCEventRecord*, TArrayF* weights=0 );
+      void Analyze( genie::NtpMCEventRecord*, RWRecord* rwrec=0 );
       
       bool IsUnphysical() const;
       
@@ -44,7 +41,7 @@ class BaseAnalyzer
 
       // data members
       //
-      virtual void DoIt( genie::NtpMCEventRecord*, TArrayF* weights=0 ) = 0;
+      virtual void DoIt( genie::NtpMCEventRecord*, RWRecord* rwrec=0 ) = 0;
       
       void SetInteraction( const IntType& type ) { fInteractionType=type; return; }
       void SetInteraction( const int prjpdg, const int nucpdg ) { fInteractionType.SetType( prjpdg, nucpdg ); return; }

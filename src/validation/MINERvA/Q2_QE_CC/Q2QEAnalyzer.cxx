@@ -12,6 +12,8 @@
 #include "Conventions/Units.h"
 #include "PDG/PDGCodes.h"
 
+#include "RWRecord.h"
+
 using namespace genie;
 using namespace PlotUtils;
 
@@ -45,7 +47,7 @@ void Q2QEAnalyzer::EndOfRun()
    return;
 }
 
-void Q2QEAnalyzer::DoIt( NtpMCEventRecord* mcrec, TArrayF* weights )
+void Q2QEAnalyzer::DoIt( NtpMCEventRecord* mcrec, RWRecord* rwrec )
 {
 
    // double check
@@ -92,21 +94,19 @@ void Q2QEAnalyzer::DoIt( NtpMCEventRecord* mcrec, TArrayF* weights )
    
    // check if (no) re-weighting...
    //
-   if ( !weights ) return;
-
+   if ( !rwrec ) return;
+   if ( rwrec->GetNumOfRWResults() <= 0 ) return;
+   
    std::vector<double> wt;
-   wt.reserve( weights->GetSize() );
+   int nres = rwrec->GetNumOfRWResults();
+   wt.reserve( nres );
    wt.clear();
-   int midpt = weights->GetSize()/2; // do not offset the counter by1 because counting starts at 0 !!!
-	                             // for example, for 5 tweaks, it'll be 0,1,2,3,4
-			             // so the mid-ponts is at 2
-   for ( int iwt=0; iwt<weights->GetSize(); ++iwt )
-   {
-      if ( iwt == midpt ) continue; // skip the mid-point as it corresponds to the CV
-      wt.push_back( weights->At(iwt) );
-   }
 
-   //
+   for ( int ir=0; ir<nres; ++ir )
+   {
+      wt.push_back(  rwrec->GetWeight( ir ) );
+   }
+      
    // init (if needs be) and fill up the vertical band 
    // with the weights coming from GENIE reweighting machinery
    //

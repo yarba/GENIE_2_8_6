@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<genie_simulation_outputs>
+         <model name="GENIE 2.8.0d">
+                 <evt_file format="ghep"> /scratch-shared/yarba_j/tmp-genie/nu-Hydrocarbon/rw-testing/100K/gntp.1.ghep.root </evt_file>
+         </model>
+</genie_simulation_outputs>

@@ -17,7 +17,7 @@ class Q2QEAnalyzer : public BaseAnalyzer
       
    protected:
    
-      virtual void DoIt( genie::NtpMCEventRecord*, TArrayF* weights=0 );
+      virtual void DoIt( genie::NtpMCEventRecord*, RWRecord* rwrec=0 );
 
 };
 

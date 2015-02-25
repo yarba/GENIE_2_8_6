@@ -7,8 +7,8 @@
 #include <vector>
 #include <string>
 
-// #include "Utils/GSimFiles.h"
 #include "Utils/CmdLnArgParser.h"
+#include "Utils/GSimFiles.h"
 #include "libxml/xmlreader.h"
 
 class ExpData;
@@ -20,7 +20,8 @@ class RunConfig
    
       RunConfig( int argc, char ** argv );
       ~RunConfig();
-      const ExpData*       GetExpData()            const { return fExpData; }
+      const genie::GSimFiles* GetSimFilesHandler() const { return fGSimFiles; }
+      const ExpData*          GetExpData()         const { return fExpData; }
 //      ExpData*       GetExpData()            const { return fExpData; }
    
    private:
@@ -30,7 +31,7 @@ class RunConfig
      bool LoadMC( const std::string& );
    
      genie::CmdLnArgParser* fLineParser;
-//     GSimFiles*      fGSimFiles;
+     genie::GSimFiles*      fGSimFiles;
      ExpData*               fExpData;
 
 };
