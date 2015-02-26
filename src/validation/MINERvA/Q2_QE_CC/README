@@ -4,6 +4,12 @@ This validation application benchmarks GENIE's Q2 QECC predictions vs MINERvA me
 The write-up contains very short information about the application, together with several 
 practical tips/instructions.
 
+*******************************************
+*                                         *
+* WARNING: NOTE NEEDS TO BE UPDATED !!!!! *
+*                                         *
+*******************************************
+
 More detailed information is provided in the MINERvA_Q2QE_validation document.
 The LaTex vesrion of the document is stored as
 doc/MINERvA_Q2QE_validation.tex
@@ -68,6 +74,8 @@ Example:
    cd splines
    wget  https://www.hepforge.org/archive/genie/data/2.8.0/gxspl-vA-v2.8.0.xml.gz
    gunzip gxspl-vA-v2.8.0.xml.gz
+      
+NOTE: you can also use more recent version of splines, e.g. 2_8_4
 
   -- Composite target
   
@@ -96,19 +104,20 @@ Because the the run number is 1 in this case, the output file will be named gntp
 
 4. GENIE Event Reweighting
 
+In this exercise we have used a custom-implemented re-weighting utility, which in its turn
+relies on the dedicated I/O infrastructure introduced specifically for tweak-weight objects.
+Please visit ReWeightIO and ReWeightExample packages, also in validation/MINERvA area; see
+corresponding README files for initial instructions.
 
-We have used the standard pre-fabricated grwght1scan utility that is available with the GENIE install. 
+As a result of running ReWeightExample/rw_app 
+$GENIE/src/validation/MINERvA/ReWeightExample/rw_app -g <input-mc>.xml -s MaCCQE -t <twk1, twk2,...>
+the original GENIE sample (see above) can be updated by adding a "reweighting" tree.
 
-In this application we varied the Axial mass for CC quasi-elastic scattering:
-
-As an input to it we have used (a copy of) pre-generated GENIE sample.
-
-Example usage is as follows:
-
-grwght1scan -f gntp.1.ghep.root -s MaCCQE -t 5 -o <output-file-name>.root
-
-Please note that "MaCCQE" is the name of the GENIE parameter that describes the axial mass for CC QE.
+NOTE: "MaCCQE" is the name of the GENIE parameter that describes the axial mass for CC QE.
 For the list of other names, please see $GENIE/src/ReWeight/GSyst.h 
+
+We will use the resulting updated sample on input to out validation application. 
+
 
 5. The Experimental Data
 

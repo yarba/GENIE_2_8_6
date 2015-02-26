@@ -1,0 +1,59 @@
+This is an example application that can run GENIE re-weighting machinery,
+and outputs the results in a form of RWBranchDesc and RWRecord oibjects.
+
+The weight calculators used in this example are all standard.
+More information on the matter can be found in Chapter 8 (p.129) of 
+GENIE Physics and User Manual:
+https://genie.hepforge.org/manuals/GENIE_PhysicsAndUserManual_20130615.pdf
+
+In general, this example has been greatly inspired by the standard GENIE 
+reweighting application gRwght1Scan (see $GENIE/src/support/rwght).
+
+The RWBranchDesc and RWRecord belong to the ReWeightIO sub-package:
+$GENIE/src/validation/MINERvA/ReWeightIO
+
+In order to build this example, you should:
+a) make sure that all GENIE environment variables are setup
+b) make sure that the libReWeightIO has been built; if not, you should 
+build it (instructins are available in the corresponding README), and
+add the library path to LD_LIBRARY_PATH
+
+The Makefile is provided for this application, and you can simply type 
+`make' in order to build it.
+
+At present, it'll open input GENIE MC sample in a foom of Root file, and 
+will create in it a dedicate TTree with the name "reweighting", and will 
+write RWRecord objects into a branch corresponding to a systematic parameter
+you choose to tweak; the name of the branch will be the same as the name of
+the systematic parameter in question.
+
+NOTE-1: Other modes (e.g. "cherry-pick", etc.) will be enebled shortly
+
+NOTE-2: You can feed the application with one or multiple input MC samples. 
+
+NOTE-2: At present we reweight CCQE events, but the applications can be 
+easily expanded to include other options.
+
+Example usage:
+rw_app -g <input-mc-spec>.xml -s MaCCQE -t -0.5,0.5
+
+Example input spec xml file is offered:
+example_mc.xml
+but should be used ONLY AS INSPIRATION, because it points to speficic sample
+in a specific user area, on a specific node (click.fnal.gov).
+
+The name of systematic parameter MaCCQE is ** mandatory ** (for the list of 
+standard names please see $GENIE/src/ReWeight/GSyst.h).
+
+The -t field allows to specify the tweaks of the systematic parameter in question;
+the tweaks are expressed in the units of parameter's sigma.
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+This package is an initial, relatively simplistic attempt to expand GENIE EDM by introducing 
+I/O infrastructure into the event reweighting  machinery.
+
+In general, event weight can be calculated based on a "tweak" of a given systematic parameter; 
+the "tweak" is expressed in the units of parameter's sigma.
+Event weight can be re-calculated as many times as the user desires.
+
+Example application that uses this infrastructure is offered in
+$GENIE/src/validation/ReWeightExample
+
+It'll create in an MC sample a seaparte tree (TTree) of the name "reweighting", and for each
+parameter to tweak will create a dedicated branch populated with RWRecord objects.
+
+RWRecord contains a collection of tweak-weight pair; it's organized in a form STL vector.
+
+If weight calculation doesn't make sense for a particular event, such event can be skipped.
+In such case the RWRecord can still be written out but the container will be empty; the access
+methods will then return tweak=0. and weight=1.
+
+RWBranchDesc is an object that allows to write branch-specific metada to the "reweighting" tree,
+in a form of UserInfo (access: TList* TTree::GetUserInfo())
+At present, the RWBranchDesc object consist of 
+a) parameter (branch) name
+b) parameter MEAN
+c) parameter sigma+ and sigma- (errors can be asymetric)
+
+Once you setup GENIE and all its environment variables, you can build this library by typing `make'.
+Once you build the library, you should add it to your LD_LIBRARY_PATH
+
+
