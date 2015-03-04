@@ -15,8 +15,7 @@ $GENIE/src/validation/MINERvA/ReWeightIO
 In order to build this example, you should:
 a) make sure that all GENIE environment variables are setup
 b) make sure that the libReWeightIO has been built; if not, you should 
-build it (instructins are available in the corresponding README), and
-add the library path to LD_LIBRARY_PATH
+build it (instructins are available in the corresponding README)
 
 The Makefile is provided for this application, and you can simply type 
 `make' in order to build it.

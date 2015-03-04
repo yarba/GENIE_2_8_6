@@ -25,6 +25,5 @@ b) parameter MEAN
 c) parameter sigma+ and sigma- (errors can be asymetric)
 
 Once you setup GENIE and all its environment variables, you can build this library by typing `make'.
-Once you build the library, you should add it to your LD_LIBRARY_PATH
 
 
