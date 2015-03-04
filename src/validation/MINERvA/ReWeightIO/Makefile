@@ -10,6 +10,8 @@ MAKEFILE = Makefile
 #
 include $(GENIE)/src/make/Make.include
 
+LIBNAME = libReWeightIO
+
 # --> CXXFLAGS += -g
 
 GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
@@ -37,7 +39,9 @@ $(DICTIONARY).cc: LinkDef.h $(DICTGEN_OBJECTS)
 
 lib: $(RW_SOURCES)
 	@echo "[package: MINERvA/ReWeightIO] Generating shared library ..."
-	$(SOCMD) $(SOFLAGS) $(SOMINF) $(RW_OBJECTS) $(EXTRA_EXT_LIBS) $(OutPutOpt) libReWeightIO.so
+	$(SOCMD) $(SOFLAGS) $(SOMINF) $(RW_OBJECTS) $(EXTRA_EXT_LIBS) $(OutPutOpt) $(LIBNAME).$(DllSuf)
+	$(COPY) $(LIBNAME).$(DllSuf) $(GENIE_LIB_PATH)/$(LIBNAME)$(GLIBVERSION).$(DllSuf)
+	$(SYMLINK) $(LIBNAME)$(GLIBVERSION).$(DllSuf) $(GENIE_LIB_PATH)/$(LIBNAME).$(DllSuf) 
 
 clean: FORCE
 	$(RM) *.o *~ core
@@ -46,7 +50,8 @@ clean: FORCE
 	$(RM) *.so
 
 distclean: FORCE
-#	$(RM) $(GENIE_BIN_INSTALLATION_PATH)/rw_example2
+	$(RM) $(GENIE_LIB_PATH)/$(LIBNAME).$(DllSuf)
+	$(RM) $(GENIE_LIB_PATH)/$(LIBNAME)$(GLIBVERSION).$(DllSuf)
 
 FORCE:
 
