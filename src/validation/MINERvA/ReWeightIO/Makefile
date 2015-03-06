@@ -10,7 +10,7 @@ MAKEFILE = Makefile
 #
 include $(GENIE)/src/make/Make.include
 
-LIBNAME = libReWeightIO
+LIBNAME = libGVldMINERvAReWeightIO
 
 # --> CXXFLAGS += -g
 

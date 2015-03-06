@@ -22,9 +22,7 @@ INCLUDES += -I$(ROOMU_DIR)/PlotUtils
 INCLUDES += -I../ReWeightIO
 #
 LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) $(ROOMU_LIBS) $(CERN_LIBRARIES)
-# LIBRARIES   += -L../ReWeightIO -l ReWeightIO
-# from now on, pick it up from standard $GENIE/lib area
-LIBRARIES   += -l ReWeightIO
+LIBRARIES   += -l GVldMINERvAReWeightIO
 
 VAL_TEST_SOURCES   := ExpData.cxx IntType.cxx MCAnalysis.cxx
 VAL_TEST_SOURCES   += $(wildcard *Analyzer*.cxx)

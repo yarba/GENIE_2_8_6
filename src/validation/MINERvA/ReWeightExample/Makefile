@@ -17,7 +17,7 @@ GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
 INCLUDES += -I../ReWeightIO
 
 LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) $(CERN_LIBRARIES)
-LIBRARIES   += -L../ReWeightIO -l ReWeightIO
+LIBRARIES   += -l GVldMINERvAReWeightIO
 
 RW_SOURCES   := $(wildcard *.cxx)
 RW_OBJECTS    = $(addsuffix .$(ObjSuf), $(basename $(RW_SOURCES)))
