@@ -14,8 +14,6 @@ include $(GENIE)/src/make/Make.include
 
 GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
 
-INCLUDES += -I../ReWeightIO
-
 LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) $(CERN_LIBRARIES)
 LIBRARIES   += -l GVldMINERvAReWeightIO
 

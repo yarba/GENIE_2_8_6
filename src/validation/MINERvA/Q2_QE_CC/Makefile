@@ -19,8 +19,7 @@ GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
 #
 INCLUDES += -I$(ROOMU_DIR)
 INCLUDES += -I$(ROOMU_DIR)/PlotUtils
-INCLUDES += -I../ReWeightIO
-#
+
 LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) $(ROOMU_LIBS) $(CERN_LIBRARIES)
 LIBRARIES   += -l GVldMINERvAReWeightIO
 

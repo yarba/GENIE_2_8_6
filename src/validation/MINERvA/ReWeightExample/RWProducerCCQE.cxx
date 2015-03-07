@@ -19,7 +19,7 @@
 #include "Interaction/Interaction.h"
 
 #include "ReWeight/GSystUncertainty.h"
-// --> ??? #include "ReWeight/GReWeightUtils.h"
+// --> not needed at the moment --> #include "ReWeight/GReWeightUtils.h"
 
 // Modules to calc weights/uncertainties
 // by varying specific variables
@@ -33,8 +33,8 @@
 
 // I/O for re-weighting info 
 //
-#include "RWBranchDesc.h"
-#include "RWRecord.h"
+#include "validation/MINERvA/ReWeightIO/RWBranchDesc.h"
+#include "validation/MINERvA/ReWeightIO/RWRecord.h"
 
 void RWProducerCCQE::DoInit()
 {

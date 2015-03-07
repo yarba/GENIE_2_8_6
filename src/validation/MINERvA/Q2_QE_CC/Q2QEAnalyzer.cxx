@@ -12,7 +12,7 @@
 #include "Conventions/Units.h"
 #include "PDG/PDGCodes.h"
 
-#include "RWRecord.h"
+#include "validation/MINERvA/ReWeightIO/RWRecord.h"
 
 using namespace genie;
 using namespace PlotUtils;

@@ -16,7 +16,7 @@ class RWInfo : public TObject {
       RWInfo() : TObject(), fTweak(0.), fWeight(1.) {}
       RWInfo( double twk, double wt ) : TObject() { fTweak=twk; fWeight=wt; }
       RWInfo( TRootIOCtor* ) : TObject(), fTweak(0.), fWeight(1.) {}
-      RWInfo( const RWInfo& r ) { fTweak=r.fTweak; fWeight=r.fWeight; }
+      RWInfo( const RWInfo& r ) : TObject() { fTweak=r.fTweak; fWeight=r.fWeight; }
       ~RWInfo() {}
       
       double GetTweak()  const { return fTweak; }

@@ -11,18 +11,22 @@
 #include "Ntuple/NtpMCFormat.h"
 #include "Ntuple/NtpMCTreeHeader.h"
 #include "Ntuple/NtpMCEventRecord.h"
+
 #include "Messenger/Messenger.h"
+
 #include "Numerical/RandomGen.h"
 #include "PDG/PDGCodes.h"
 #include "PDG/PDGCodeList.h"
 
 #include "ReWeight/GSystUncertainty.h"
-// --> ??? #include "ReWeight/GReWeightUtils.h"
+// --> not needed at the moment -->  #include "ReWeight/GReWeightUtils.h"
 
 // I/O for re-weighting info 
 //
-#include "RWBranchDesc.h"
-#include "RWRecord.h"
+#include "validation/MINERvA/ReWeightIO/RWBranchDesc.h"
+#include "validation/MINERvA/ReWeightIO/RWRecord.h"
+
+using genie::Messenger;
 
 BaseRWProducer::BaseRWProducer()
    : fRWTree(0), fExistingRWTree(false), fInputFile(0), fOutputFile(0)
@@ -160,8 +164,8 @@ void BaseRWProducer::Init( const std::string& sample )
          RWBranchDesc* bd = dynamic_cast<RWBranchDesc*>( fRWTree->GetUserInfo()->At(imd) );
 	 if ( bd->GetParameterName() == genie::rew::GSyst::AsString(fParam2Tweak) )
 	 {
-	    std::cout << " Metadata already exist for syst.parameter " 
-	              << genie::rew::GSyst::AsString(fParam2Tweak) << std::endl;
+	    LOG( "gvldtest", pWARN ) << " Metadata already exist for syst.parameter: " 
+	                             << genie::rew::GSyst::AsString(fParam2Tweak) ;
 	    return; // Do NOT override for now, although in principle, one should probably remove the existing one and replace
 	 }
       }   
@@ -204,7 +208,7 @@ void BaseRWProducer::ReWeight( const std::string& sample )
    }
    else
    {
-      std::cout << " WARNING !!! You are going to override an existing branch ! " << std::endl;
+      LOG( "gvldtest", pWARN ) << " You are going to override an existing branch !!! ";
       fRWTree->SetBranchAddress( param_name.c_str(), &rwrec );
    }
    
@@ -264,22 +268,16 @@ void BaseRWProducer::ReWeight( const std::string& sample )
          delete cpmcrec;
          cpmcrec = 0;
       }
-       
-      
+             
       mcrec->Clear();
-            
-      // FIXME !!!
-      // Try to figure out if the tree of copy-events can be expanded 
-      // by inserting additional events... 
-      // ... if that needs to be ???...
-            
+
    }   
    
    // check for consistency - # of branches should be equal to the # of branch descriptions
    //
    if ( fRWTree->GetNbranches() != fRWTree->GetUserInfo()->GetSize() ) // NOTE: GetSize() == GetEntries()
    {
-      std::cout << "WARNING: NUMBER OF BRANCHES IS DIFFERENT FROM THE NUMBER OF BRANCH METADATA" << std::endl;
+      LOG( "gvldtest", pWARN ) << " NUMBER OF BRANCHES IS DIFFERENT FROM THE NUMBER OF BRANCH METADATA";
    }
    
    if ( fOutputMode == "UPDATE") 

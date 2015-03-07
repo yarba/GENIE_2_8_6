@@ -25,7 +25,7 @@
 #include "Q2QEAnalyzer.h"
 #include "ExpData.h"
 
-#include "RWRecord.h"
+#include "validation/MINERvA/ReWeightIO/RWRecord.h"
 
 using namespace genie;
 
