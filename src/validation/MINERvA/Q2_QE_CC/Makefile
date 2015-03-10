@@ -14,16 +14,23 @@ include $(GENIE)/src/make/Make.include
 # --> CXXFLAGS += -g
 
 GENIE_LIBS   = $(shell $(GENIE)/src/scripts/setup/genie-config --libs)
+GENIE_LIBS   += -lGVldMINERvA -lGVldTuning -lGVldMINERvAReWeightIO
 
 # include RooMUHisto package
+#
+# tmp stuff
+ROOMU_DIR = $(ROOMU_SYS)
+ROOMU_LIB_DIR = $(ROOMU_SYS)/lib
+ROOMU_LIBS = -L$(ROOMU_LIB_DIR) -l plotutils
 #
 INCLUDES += -I$(ROOMU_DIR)
 INCLUDES += -I$(ROOMU_DIR)/PlotUtils
 
 LIBRARIES   := $(GENIE_LIBS) $(LIBRARIES) $(ROOMU_LIBS) $(CERN_LIBRARIES)
-LIBRARIES   += -l GVldMINERvAReWeightIO
+# LIBRARIES   += -lGVldTuning -lGVldMINERvAReWeightIO
 
-VAL_TEST_SOURCES   := ExpData.cxx IntType.cxx MCAnalysis.cxx
+# VAL_TEST_SOURCES   := ExpData.cxx IntType.cxx MCAnalysis.cxx
+VAL_TEST_SOURCES   := ExpData.cxx MCAnalysis.cxx
 VAL_TEST_SOURCES   += $(wildcard *Analyzer*.cxx)
 VAL_TEST_SOURCES   += $(wildcard *DataMC*.cxx)
 VAL_TEST_SOURCES   += RunConfig.cxx

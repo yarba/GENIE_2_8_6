@@ -27,10 +27,11 @@ UTILS := Numerical CrossSections PDG Utils
 OPTIONAL_MODULES := NucleonDecay ReWeight VLE VHE FluxDrivers Geo MuELoss
 
 VLD_TOOLS := validation/EvScan validation/MCx validation/NuXSec validation/StructFunc validation/Hadronization validation/Intranuke validation/Merenyi validation/eA
-# VLD_TOOLS := validation/EvScan validation/MCx validation/NuXSec validation/StructFunc validation/Hadronization validation/Intranuke validation/Merenyi validation/eA validation/MINERvA/Q2_QE_CC
+VLD_TOOLS += validation/Tuning
 ifeq ($(strip $(GOPT_ENABLE_ROOMUHISTOS)),YES)
-VLD_TOOLS += validation/MINERvA/ReWeightIO
-VLD_TOOLS += validation/MINERvA/Q2_QE_CC
+#VLD_TOOLS += validation/MINERvA/ReWeightIO
+#VLD_TOOLS += validation/MINERvA/Q2_QE_CC
+VLD_TOOLS += validation/MINERvA
 endif
 
 EVGEN_MODULES := BaryonResonance Base EVGCore EVGDrivers Interaction GHEP Ntuple

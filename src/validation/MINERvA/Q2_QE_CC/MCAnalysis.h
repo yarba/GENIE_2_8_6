@@ -2,7 +2,7 @@
 #define Val_MINERvA_MCAnalysis_H
 
 #include <string>
-#include "IntType.h"
+#include "validation/MINERvA/DataComp/IntType.h"
 #include "BaseAnalyzer.h"
 
 class TTree;

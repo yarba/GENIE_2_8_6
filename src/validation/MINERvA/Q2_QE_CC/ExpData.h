@@ -7,58 +7,50 @@
 
 #include "PlotUtils/MUH1D.h"
 
-#include "IntType.h"
+#include "validation/MINERvA/DataComp/IntType.h"
+#include "validation/MINERvA/DataComp/MINERvAExData.h"
 
-class ExpDataSet
+class ExpDataSet : public genie::mc_vs_data::MINERvAExData
 {
 
    public:
    
       // ctor & dtor
       //
-      ExpDataSet() : fCurrentExpDataPath(""), fReference(""), fObservable(""), 
-                     fDataHisto(0), fCorrMatrix(0), fCovMatrix(0),
-		     fDataHistoShape(0), fCorrMatrixShape(0), fCovMatrixShape(0) {};
-      ~ExpDataSet();
+      ExpDataSet() : genie::mc_vs_data::MINERvAExData(),
+                     fDataHisto(0), 
+		     fDataHistoShape(0) {};
+      virtual ~ExpDataSet();
       
       const std::string&  GetReference()         const { return fReference; }
       const std::string&  GetObservable()        const { return fObservable; }
       const IntType&      GetInteraction()       const { return fInteraction; }
 
-// Don't give a bare pointeranymore
+// Don't give a bare pointer anymore
 //
 // -->      PlotUtils::MUH1D*   GetDataHistoPtr() const { return fDataHisto; }
       PlotUtils::MUH1D    GetDataHisto()          const { PlotUtils::MUH1D h(*fDataHisto); return h;  }
       PlotUtils::MUH1D    GetDataHistoAsShape()   const;    
       
-      bool ReadData( const std::string& path ) ;
+      virtual bool Read( const std::string path, Option_t* opt=0 ) ;
            
+   protected: 
+   
+      virtual void CreateCovMatrix(  bool shapeonly=false );
+   
    private:
    
       // member functions
       //
-      void CreateDataHisto( const std::vector<double>&, const std::vector<double>&, 
-                            const std::vector<double>&, const std::vector<double>&,
-			    bool shapeonly=false );
-      void CreateCovMatrix( const std::vector<double>&, bool shapeonly=false );
-      void SplitString( const std::string&, const std::string, std::vector<std::string>& );
+//      void CreateDataHisto( const std::vector<double>&, const std::vector<double>&, 
+//                            const std::vector<double>&, const std::vector<double>&,
+//			    bool shapeonly=false );
+      void CreateDataHisto( bool shapeonly=false );
    
       // data members
-      //
-      std::string       fCurrentExpDataPath;
-      
-      std::string       fReference;
-      
-      IntType           fInteraction;
-      std::string       fObservable;
-      
-      PlotUtils::MUH1D* fDataHisto;
-      TMatrixD*         fCorrMatrix;
-      TMatrixD*         fCovMatrix;
-      
+      //            
+      PlotUtils::MUH1D* fDataHisto;      
       PlotUtils::MUH1D* fDataHistoShape;
-      TMatrixD*         fCorrMatrixShape;
-      TMatrixD*         fCovMatrixShape;   
 
 };
 

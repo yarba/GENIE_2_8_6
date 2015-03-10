@@ -2,7 +2,7 @@
 #define Val_MINERvA_BaseAnalyzer_H
 
 #include <string>
-#include "IntType.h"
+#include "validation/MINERvA/DataComp/IntType.h"
 
 #include "PlotUtils/MUH1D.h"
 

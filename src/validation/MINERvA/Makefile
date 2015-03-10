@@ -4,7 +4,7 @@ MAKEFILE = Makefile
 
 include $(GENIE)/src/make/Make.include
 
-MODULES := ReWeightIO ReWeightExample Q2_QE_CC
+MODULES := DataComp ReWeightIO ReWeightExample Q2_QE_CC
 
 .PHONY: all $(MODULES)
 
