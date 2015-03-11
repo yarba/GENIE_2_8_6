@@ -1,9 +1,9 @@
-#include "RunConfig.h"
+#include "validation/MINERvA/Common/RunConfig.h"
 
 #include "Messenger/Messenger.h"
 #include "Utils/StringUtils.h"
 
-#include "ExpData.h"
+#include "validation/MINERvA/Common/ExpData.h"
 
 #include "libxml/parser.h"
 #include "libxml/xmlmemory.h"

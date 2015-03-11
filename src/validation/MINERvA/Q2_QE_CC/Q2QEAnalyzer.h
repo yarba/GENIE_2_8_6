@@ -1,7 +1,7 @@
 #ifndef Val_MINERvA_Q2QEAnalyzer_H
 #define Val_MINERvA_Q2QEAnalyzer_H
 
-#include "BaseAnalyzer.h"
+#include "validation/MINERvA/Common/BaseAnalyzer.h"
 
 class Q2QEAnalyzer : public BaseAnalyzer
 {

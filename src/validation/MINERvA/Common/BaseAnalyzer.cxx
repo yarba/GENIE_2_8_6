@@ -1,5 +1,5 @@
 
-#include "BaseAnalyzer.h"
+#include "validation/MINERvA/Common/BaseAnalyzer.h"
 
 #include "EVGCore/EventRecord.h"
 #include "GHEP/GHepParticle.h"

@@ -33,18 +33,11 @@ class ExpDataSet : public genie::mc_vs_data::MINERvAExData
       PlotUtils::MUH1D    GetDataHistoAsShape()   const;    
       
       virtual bool Read( const std::string path, Option_t* opt=0 ) ;
-           
-   protected: 
-   
-      virtual void CreateCovMatrix(  bool shapeonly=false );
-   
+                 
    private:
    
       // member functions
       //
-//      void CreateDataHisto( const std::vector<double>&, const std::vector<double>&, 
-//                            const std::vector<double>&, const std::vector<double>&,
-//			    bool shapeonly=false );
       void CreateDataHisto( bool shapeonly=false );
    
       // data members

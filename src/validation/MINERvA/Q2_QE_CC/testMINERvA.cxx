@@ -7,16 +7,10 @@
 
 #include "Messenger/Messenger.h"
 
-#include "RunConfig.h"
-#include "ExpData.h"
+#include "validation/MINERvA/Common/RunConfig.h"
+#include "validation/MINERvA/Common/ExpData.h"
 #include "MCAnalysis.h"
 #include "MINERvADataMC.h"
-
-
-// provisions for future development
-//
-// #include "Utils/GSimFiles.h"
-// #include "Utils/CmdLnArgParser.h"
 
 using namespace PlotUtils;
 using namespace genie; // for the GENIE's LOG Messager... 
@@ -24,7 +18,7 @@ using namespace genie; // for the GENIE's LOG Messager...
 //
 // current usage pattern (example):
 //
-// ./gvld_MINERvA_Q2_QE_CC -d MINERvA_expdata_input.xml
+// ./gvld_MINERvA_Q2_QE_CC -g example_mc_input.xml-d MINERvA_expdata_input.xml
 //
 
 int main( int argc, char ** argv )
@@ -46,11 +40,6 @@ int main( int argc, char ** argv )
       const ExpDataSet* dset   = run->GetExpData()->GetExpDataSet( i );
       mcanalysis->AddMCAnalyzer( dset );
    }
-
-// --> provisions for future development
-//
-//   GSimFiles* gsimreader = new GSimFiles( false, 10 ); // no chain; max 10 models (i.e. versions)
-//   bool ok = gsimreader->LoadFromFile( "./gntp.1.ghep.root" );
       
    //
    // clear everything out  before startingg run(s)
@@ -66,7 +55,6 @@ int main( int argc, char ** argv )
    //
    for ( unsigned int imc=0; imc<mcfiles->EvtFileNames(imodel).size(); ++imc )
    {
-//      mcanalysis->Analyze( "/scratch-shared/yarba_j/tmp-genie/nu-Hydrocarbon/rw-testing/100K/gntp.1.ghep.root" );
       mcanalysis->Analyze( mcfiles->EvtFileNames(imodel)[imc] );
    }
 

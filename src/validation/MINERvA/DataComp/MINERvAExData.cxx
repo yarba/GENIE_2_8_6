@@ -27,8 +27,6 @@ MINERvAExData::~MINERvAExData()
 
 }
 
-//----------?????????? NEW DEV !!!!!!!!!!!!!!!
-
 bool MINERvAExData::Read( const std::string path, Option_t* )
 {
  
@@ -139,7 +137,6 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	 continue;
       }
       
-//      if ( line1.find("<DataTable>") != std::string::npos )
       if ( line1.find("<DataTable") != std::string::npos ) // do not include the ">" closing bracket
                                                            // since there maybe 2 tables - regilar and/or shape-only 
       {          	 
@@ -152,7 +149,6 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	    line1 = std::string ( line );
 	    if ( line1.find("#") == 0 ) continue; // comment line
 	    if ( line1.find_first_not_of(del) == std::string::npos ) continue; // empty line
-//	    if ( line1.find("</DataTable>") != std::string::npos ) break; // found end-tag for DataTable
 	    if ( line1.find("</DataTable") != std::string::npos ) break; // found end-tag for DataTable
 	                                                                 // NOTE: do not use the ">" closing bracket
 									 // sincere there maybe 2 types - regular or shape-only
@@ -177,16 +173,16 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	          if ( fDataShape.empty() )
 		  {
 		     if ( !fSysErrShapeExist ) fSysErrShapeExist = true;
-		     if ( fSysErrShapeExist ) esys = atof(tokens[4].c_str());
 		  }
+		  if ( fSysErrShapeExist ) esys = atof(tokens[4].c_str());
 	       }
 	       else
 	       {
 	          if ( fData.empty() )
 		  {
 		     if ( !fSysErrExist ) fSysErrExist = true;
-		     if ( fSysErrExist ) esys = atof(tokens[4].c_str());
 		  }
+		  if ( fSysErrExist ) esys = atof(tokens[4].c_str());
 	       }
 	    }
 	    	    
@@ -206,7 +202,6 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	 continue;
       }
       
-//      if ( line1.find("<CorrelationMatrix>") != std::string::npos )
       if ( line1.find("<CorrelationMatrix") != std::string::npos ) // do not use the ">" closing braket 
                                                                     // since there maybe 2 types of corr.mtx
 								    // - regular or shape-only
@@ -236,7 +231,6 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	    line1 = std::string( line );	    
 	    if ( line1.find("#") == 0 ) continue; // comment line
 	    if ( line1.find_first_not_of(del) == std::string::npos ) continue; // empty line
-//	    if ( line1.find("</CorrelationMatrix>") != std::string::npos ) break; // found end-tag for Corr.Mtx
 	    if ( line1.find("</CorrelationMatrix") != std::string::npos ) break; // found end-tag for Corr.Mtx
 	                                                                         // NOTE: do not use the ">" closing braket
 	    tokens.clear();
@@ -251,7 +245,8 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	    }
 	    if ( !shapeflag ) 
 	    {
-	       // FIXME !!! it assumes that fDataHisto is already in place...
+	       // it assumes that fData has already been populated
+	       // need to reflect it in the doc and perhaps in the dataset itself (as a comment)
 	       //
 	       if ( !fCorrMatrix ) fCorrMatrix = new TMatrixD( ((int)(fData.size())+2), 
 	                                                       ((int)(fData.size())+2) );
@@ -325,7 +320,6 @@ bool MINERvAExData::Read( const std::string path, Option_t* )
 	 // OK, we get here if everything is fine
 	 // now go ahead and create cov.mtx from corr.mtx & esys vector
 	 //
-//	 CreateCovMatrix( vesys, shapeflag ); // -------------> FIXME !!!
 	 CreateCovMatrix( shapeflag ); 
 	 continue;
       }
@@ -355,42 +349,42 @@ void MINERvAExData::CreateCovMatrix( bool shapeonly )
    
    // make sure corr.mtx object(s) exists
    //
-   // FIXME !!! Spit out a warning message ???
+   if ( !fCorrMatrix && !shapeonly ) 
+   {
+      LOG("gvldtest", pWARN) << " Can NOT calculate Covariance Matrix because there is NO Correlation Matrix; do nothing" ;
+      return;   
+   }   
+   if ( !fCorrMatrixShape && shapeonly ) 
+   {
+      LOG("gvldtest", pWARN) << " Can NOT calculate Shape-only Covariance Matrix because there is NO Shape-only Correlation Matrix; do nothing" ;
+      return;
+   }
+   
+   // convert the vector of esys (as per bin) into diagonal mtx
    //
-   if ( !fCorrMatrix && !shapeonly ) return;
-   
-   if ( !fCorrMatrixShape && shapeonly ) return;
-   
-   int nx = 0;
+   std::vector<MINERvAExBin> dtmp;
+   dtmp.clear();
    if ( shapeonly )
    {
-      nx = fDataShape.size();
+      dtmp = fDataShape;
    }
    else
    {
-      nx = fData.size();
+      dtmp = fData;
    }
-   if ( nx == 0 ) return; // FIXME !!! need to spit a warning message !!!
+   int nx = dtmp.size();
    TMatrixD ESys(nx+2,nx+2);
    for ( int i=0; i<nx; ++i )
    {
-      if ( shapeonly )
-      {
-         ESys[i+1][i+1] = fDataShape[i].GetSysError();
-      }
-      else
-      {
-         ESys[i+1][i+1] = fData[i].GetSysError();
-      }
+      ESys[i+1][i+1] = dtmp[i].GetSysError(); 
    }
    
-  // FIXME !!!
+   // FIXME !!!
    // The MINERvA paper says the corr.mtx is for *total* (stat+sys) uncertainties
    // should I add stat & sys in quadrature, and then apply the corr.mtx ????
    //
    // for now let's do sys errors only
-   //
-   
+   //   
    // Cov = ESys * Corr * ESys 
    //
    if ( !shapeonly )
@@ -405,7 +399,7 @@ void MINERvAExData::CreateCovMatrix( bool shapeonly )
       (*fCovMatrixShape) = ESys * (*fCorrMatrixShape);
       (*fCovMatrixShape) *= ESys;
    }
-      
+
    return;
 
 }

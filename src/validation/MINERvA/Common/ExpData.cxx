@@ -1,13 +1,11 @@
 #include <TSystem.h>
 #include <Riostream.h>
-// #include <TDirectory.h>
 
 // Use GENIE message logger instead of std::cout/std::endl;
 //
 #include "Messenger/Messenger.h"
 
-#include "ExpData.h"
-// #include <algorithm> // to be able to use atof(...), etc.
+#include "validation/MINERvA/Common/ExpData.h"
 
 using namespace PlotUtils;
 using namespace genie;
@@ -71,38 +69,40 @@ bool ExpDataSet::Read( std::string path, Option_t*  )
    // 2) add sys errors as a diagonal cov.matrix - this way the sys errors will be 100% UNcorrelated 
    //    with PushUncorrError( const std::string& name, TH1D* err ) 
    // 
-//   if ( !shapeflag && fDataHisto && fCorrMatrix == 0 && fCovMatrix == 0 )
-   if ( fDataHisto && fCorrMatrix == 0 && fCovMatrix == 0 )
+   if ( fDataHisto && fSysErrExist )
    { 
-      // below is how to add 2-universe error band (100% corr.)
-      // this is the easiest and most universal way to handle the case
-      // as it fits both cases - symmetric or asymmetric errors
-      //
-      fDataHisto->AddVertErrorBand( "ESys", 2 );
-      //
-      // now you must reset it before filling up because by default it'll copy over
-      // contents of fDataHisto into the C(entral) V(alue), thus if I fill it up
-      // without resetting, your CV will double
-      //
-      //
-      fDataHisto->GetVertErrorBand("ESys")->Reset();
-      // 
-      // OK, your CV is cleared, and you can safel fill your band
-      //
-      for ( int i=0; i<fDataHisto->GetNbinsX(); ++i )
+      if ( fCorrMatrix == 0 && fCovMatrix == 0 )
       {
-	 // fill up "vertical error band" with sys errors (use max spread, i.e. +/-sigma)
-         // remember that bin *numbering* in TH starts at 1, not 0, this (i+1)th bin
-	 // also remember to "weight" the bin by the xsec (vxsec[i]); otherwise the value will be 1
-         // also recalculate sys errors (down/up) into **weights** (scale) that is (1.-/+(esys/xsec))
+         // below is how to add 2-universe error band (100% corr.)
+         // this is the easiest and most universal way to handle the case
+         // as it fits both cases - symmetric or asymmetric errors
          //
-         double xx = fDataHisto->GetBinCenter(i+1);
-	 fDataHisto->FillVertErrorBand( "ESys", xx, 
-                                        (1.-(fData[i].GetSysError()/fData[i].GetContent())), 
-					(1.+(fData[i].GetSysError()/fData[i].GetContent())), 
-					fData[i].GetContent() );      
-      }      
-   } // end-if check that neither corr.ntx nor cov.ntx exist
+         fDataHisto->AddVertErrorBand( "ESys", 2 );
+         //
+         // now you must reset it before filling up because by default it'll copy over
+         // contents of fDataHisto into the C(entral) V(alue), thus if I fill it up
+         // without resetting, your CV will double
+         //
+         //
+         fDataHisto->GetVertErrorBand("ESys")->Reset();
+         // 
+         // OK, your CV is cleared, and you can safel fill your band
+         //
+         for ( int i=0; i<fDataHisto->GetNbinsX(); ++i )
+         {
+	    // fill up "vertical error band" with sys errors (use max spread, i.e. +/-sigma)
+            // remember that bin *numbering* in TH starts at 1, not 0, this (i+1)th bin
+	    // also remember to "weight" the bin by the xsec (vxsec[i]); otherwise the value will be 1
+            // also recalculate sys errors (down/up) into **weights** (scale) that is (1.-/+(esys/xsec))
+            //
+            double xx = fDataHisto->GetBinCenter(i+1);
+	    fDataHisto->FillVertErrorBand( "ESys", xx, 
+                                           (1.-(fData[i].GetSysError()/fData[i].GetContent())), 
+		   			   (1.+(fData[i].GetSysError()/fData[i].GetContent())), 
+					   fData[i].GetContent() );      
+         } 
+      }     
+   } // end-if check that neither corr.ntx nor cov.mtx exist
 
    //
    // now same thing for shape-only histo, if exists
@@ -215,71 +215,17 @@ void ExpDataSet::CreateDataHisto( bool shapeonly )
       }
    }
    
-   delete [] xbins;
-
-   return;
-
-}
-
-void ExpDataSet::CreateCovMatrix( bool shapeonly )
-{
-
-   // make sure corr.mtx object(s) exists
-   //
-   if ( !fCorrMatrix && !shapeonly ) 
-   {
-      LOG("gvldtest", pWARN) << " Can NOT calculate Covariance Matrix because there is NO Correlation Matrix; do nothing" ;
-      return;   
-   }   
-   if ( !fCorrMatrixShape && shapeonly ) 
-   {
-      LOG("gvldtest", pWARN) << " Can NOT calculate Shape-only Covariance Matrix because there is NO Shape-only Correlation Matrix; do nothing" ;
-      return;
-   }
-   
-   // convert the vector of esys (as per bin) into diagonal mtx
-   //
-   std::vector<MINERvAExBin> dtmp;
-   dtmp.clear();
-   if ( shapeonly )
-   {
-      dtmp = fDataShape;
-   }
-   else
-   {
-      dtmp = fData;
-   }
-   int nx = dtmp.size();
-   TMatrixD ESys(nx+2,nx+2);
-   for ( int i=0; i<nx; ++i )
-   {
-      ESys[i+1][i+1] = dtmp[i].GetSysError(); 
-   }
-   
-   // FIXME !!!
-   // The MINERvA paper says the corr.mtx is for *total* (stat+sys) uncertainties
-   // should I add stat & sys in quadrature, and then apply the corr.mtx ????
-   //
-   // for now let's do sys errors only
-   //
-   
-   // Cov = ESys * Corr * ESys 
+   // add err. matrix
    //
    if ( !shapeonly )
    {
-      fCovMatrix = new TMatrixD(nx+2,nx+2);
-      (*fCovMatrix) = ESys * (*fCorrMatrix);
-      (*fCovMatrix) *= ESys;   
-      // and now push it together with the data histo
-      //
-      fDataHisto->PushCovMatrix( "ESys", *fCovMatrix ); 
+      if ( fCovMatrix ) 
+      {
+         fDataHisto->PushCovMatrix( "ESys", *fCovMatrix );
+      } 
    }
    else
    {
-      fCovMatrixShape = new TMatrixD(nx+2,nx+2);
-      (*fCovMatrixShape) = ESys * (*fCorrMatrixShape);
-      (*fCovMatrixShape) *= ESys;
-
       //
       // NOTE: there's a "feature" of in RooMUHisto that probably need to be fixed;
       //       only after that it can be fixed here.
@@ -289,14 +235,20 @@ void ExpDataSet::CreateCovMatrix( bool shapeonly )
       //       that EXPLICITLY CHOPS OFF the "_asShape" variant !
       //       So without the "regular variant" the "_asShape" one is helpless/useless, helas !!!
       //
-      fDataHistoShape->PushCovMatrix( "ESys", *fCovMatrixShape ); // 3rd arg - cov_area_normalize=true
-      fDataHistoShape->PushCovMatrix( "ESys", *fCovMatrixShape, true ); // 3rd arg - cov_area_normalize=true
-                                                                        // which means "_asShape"   
+      if ( fCovMatrixShape )
+      {
+         fDataHistoShape->PushCovMatrix( "ESys", *fCovMatrixShape ); // 3rd arg - cov_area_normalize=true
+         fDataHistoShape->PushCovMatrix( "ESys", *fCovMatrixShape, true ); // 3rd arg - cov_area_normalize=true
+                                                                           // which means "_asShape"   
+      }
    }
-      
+   
+   delete [] xbins;
+
    return;
 
 }
+
 
 // -------------------------
 
@@ -313,8 +265,6 @@ ExpData::~ExpData()
 
 void ExpData::ReadExpData( const std::string& path )
 {
-
-   // NOTE: this actually has to a be an XML file that could specify multiple datasets !!!
 
    bool exists = !( gSystem->AccessPathName( path.c_str() ) );
    if ( !exists )

@@ -1,8 +1,8 @@
 
 #include "MINERvADataMC.h"
 
-#include "ExpData.h"
-#include "BaseAnalyzer.h"
+#include "validation/MINERvA/Common/ExpData.h"
+#include "validation/MINERvA/Common/BaseAnalyzer.h"
 
 #include "PlotUtils/MUH1D.h"
 // #include "PlotUtils/MUApplication.h"

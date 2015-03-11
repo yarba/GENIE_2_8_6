@@ -1,7 +1,7 @@
 
 #include "ResultsDataMC.h"
 
-#include "ExpData.h"
+#include "validation/MINERvA/Common/ExpData.h"
 #include "MCAnalysis.h"
 
 void ResultsDataMC::FinalizeResults( const ExpData* data, const MCAnalysis* mcanalysis )

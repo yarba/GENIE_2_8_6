@@ -3,7 +3,7 @@
 
 #include <string>
 #include "validation/MINERvA/DataComp/IntType.h"
-#include "BaseAnalyzer.h"
+#include "validation/MINERvA/Common/BaseAnalyzer.h"
 
 class TTree;
 class TH1D;

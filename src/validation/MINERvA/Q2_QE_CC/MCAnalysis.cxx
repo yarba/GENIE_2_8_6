@@ -23,7 +23,8 @@
 
 #include "MCAnalysis.h"
 #include "Q2QEAnalyzer.h"
-#include "ExpData.h"
+
+#include "validation/MINERvA/Common/ExpData.h"
 
 #include "validation/MINERvA/ReWeightIO/RWRecord.h"
 
